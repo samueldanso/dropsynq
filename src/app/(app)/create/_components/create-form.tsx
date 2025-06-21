@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function Home() {
+export default function CreateForm() {
 	const [file, setFile] = useState<File>();
 	const [url, setUrl] = useState("");
 	const [uploading, setUploading] = useState(false);
@@ -17,7 +17,7 @@ export default function Home() {
 			setUploading(true);
 			const data = new FormData();
 			data.set("file", file);
-			const uploadRequest = await fetch("/api/upload", {
+			const uploadRequest = await fetch("/api/tracks/create", {
 				method: "POST",
 				body: data,
 			});
@@ -46,3 +46,5 @@ export default function Home() {
 		</main>
 	);
 }
+
+// This component will be the main form for track submission.

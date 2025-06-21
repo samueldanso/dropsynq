@@ -3,8 +3,8 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		DATABASE_URL: z.string().optional(),
-		SUPABASE_SERVICE_KEY: z.string().optional(),
+		DATABASE_URL: z.string(),
+		SUPABASE_SERVICE_KEY: z.string(),
 		PINATA_JWT: z.string(),
 		ZORA_API_KEY: z.string(),
 	},
@@ -12,8 +12,8 @@ export const env = createEnv({
 		NEXT_PUBLIC_APP_URL: z.string().url(),
 		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string().min(1).optional(),
 		NEXT_PUBLIC_PRIVY_APP_ID: z.string().min(1),
-		NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
-		NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+		NEXT_PUBLIC_SUPABASE_URL: z.string(),
+		NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
 		NEXT_PUBLIC_GATEWAY_URL: z.string(),
 	},
 
