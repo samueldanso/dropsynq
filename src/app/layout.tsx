@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import Providers from "@/components/providers";
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
@@ -24,8 +25,8 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${manrope.variable} antialiased`}>
-				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-					{children}
+				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+					<Providers>{children}</Providers>
 					<Toaster />
 				</ThemeProvider>
 			</body>
