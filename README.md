@@ -1,10 +1,10 @@
-<a href="https://synqbase.xyz">
-  <img alt="SynqBase – Tokenise, Connect & Monetize your FanBase" src="https://raw.githubusercontent.com/samueldanso/SynqBase/main/public/images/banner.png">
+<a href="https://dropsynq.xyz">
+  <img alt="DropSynq – Tokenise, Connect & Monetize your FanBase" src="https://raw.githubusercontent.com/samueldanso/SynqBase/main/public/images/banner.png">
   <h1 align="center">SynqBase</h1>
 </a>
 
 <p align="center">
-SynqBase is a SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. Built on Zora, it lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music.
+DropSynq is a SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. Built on Zora, it lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music.
 </p>
 
 ## Problem
@@ -13,7 +13,7 @@ Artists struggle to monetize directly, with traditonal streaming platforms takin
 
 ## Solution
 
-SynqBase enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans can discover, buy, trade, and collect songs as assets while sharing in the upside — creating a new music economy where both artists and fans benefit.
+DropSynq enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans can discover, buy, trade, and collect songs as assets while sharing in the upside — creating a new music economy where both artists and fans benefit.
 
 ## Features
 
@@ -55,7 +55,7 @@ SynqBase enables artists to mint their songs as tokenized music coins on Zora, p
 
 ## Zora Protocol Integration
 
-SynqBase is built directly on top of Zora’s CoinV4 contract using the official SDK. Artists tokenize each song as a coin. This enables track ownership, tradability, and community monetization using Zora’s infrastructure.
+DropSynq is built directly on top of Zora’s CoinV4 contract using the official SDK. Artists tokenize each song as a coin. This enables track ownership, tradability, and community monetization using Zora’s infrastructure.
 
 ## Project Structure
 
@@ -72,7 +72,7 @@ SynqBase is built directly on top of Zora’s CoinV4 contract using the official
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/samueldanso/SynqBase.git
+   git clone https://github.com/samueldanso/DropSynq.git
    cd SynqBase
    ```
 
@@ -119,4 +119,4 @@ PINATA_JWT=your_pinata_jwt_secret_key
 
 ## Links
 
-- **Live Demo**: [synqbase.xyz](https://synqbase.xyz)
+- **Live Demo**: [dropsynq.xyz](https://dropsynq.xyz)
