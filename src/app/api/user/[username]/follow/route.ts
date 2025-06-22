@@ -1,11 +1,17 @@
 import { and, eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { follows } from "@/lib/db/schemas";
 import { getAuth, privyClient } from "@/lib/privy";
 
-export async function GET(req: Request, { params }: { params: { username: string } }) {
-	const followerAddress = params.username;
+interface RouteContext {
+	params: {
+		username: string;
+	};
+}
+
+export async function GET(_req: NextRequest, context: RouteContext) {
+	const followerAddress = context.params.username;
 
 	if (!followerAddress) {
 		return NextResponse.json({ error: "Follower address is required" }, { status: 400 });
@@ -28,13 +34,13 @@ export async function GET(req: Request, { params }: { params: { username: string
 	}
 }
 
-export async function POST(req: Request, { params }: { params: { username: string } }) {
+export async function POST(req: NextRequest, context: RouteContext) {
 	const claims = await getAuth(req);
 	if (!claims) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
-	const followeeAddress = params.username; // The user being followed
+	const followeeAddress = context.params.username; // The user being followed
 
 	try {
 		const user = await privyClient.getUser(claims.userId);

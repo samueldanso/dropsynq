@@ -3,7 +3,6 @@ export interface Coin {
 	name: string;
 	symbol: string;
 	address: string;
-	owner: string;
 	chainId: number;
 	totalSupply: string;
 	volume24h: string;
@@ -19,7 +18,10 @@ export interface Coin {
 
 export interface CoinBalance {
 	id: string;
-	balance: string;
+	amount: {
+		amountRaw: string;
+		amountDecimal: number;
+	};
 	coin?: Coin;
 	timestamp?: string;
 }
