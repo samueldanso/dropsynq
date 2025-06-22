@@ -11,9 +11,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-	title: "SynqBase — Tokenize, Connect & Monetize Your Fanbase",
+	title: "SynqBase — A SocialFi music platform for artists and fans, built on Zora",
 	description:
-		"SynqBase is the SocialFi music platform where artists tokenize their music and fans earn rewards for engagement - powered by Zora's Protocol.",
+		"SynqBase is a SocialFi music platform where artists launch tokenized songs, and fans discover, trade, connect, and earn — all on Zora.",
 	icons: [{ rel: "icon", url: "/favicon.svg" }],
 };
 

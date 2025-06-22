@@ -4,45 +4,48 @@
 </a>
 
 <p align="center">
-SynqBase is a SocialFi music platform where artists tokenize their songs into tradable coins and monetize directly from their fans.
-Built on the Zora Protocol, it allows fans to buy into the music they love, access exclusive drops, support rising talent, and earn rewards — unlocking a new way to release music as coins, reach fans, and build lasting connections — all in one platform.
+
+SynqBase is a SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. Built on Zora, it lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music.
+
 </p>
 
 ## Problem
 
-Independent artists often struggle monetizing their music without relying on middlemen. Traditional platforms like Spotify take high cuts, lack transparency, and offer no way for fans to invest in the artist’s journey. Today, fans are just passive listeners — they can’t support or benefit from an artist's rise in any meaningful way.
+Artists often struggle to monetize their music directly, especially independent creators who rely on streaming platforms like Spotify that take large cuts and offer little control or ownership. Meanwhile, fans who genuinely support artists have no meaningful way to directly invest in and truly own the music they love and artists they believe in, or share in their success. Today, fans are just passive listeners.
 
 ## Solution
 
-SynqBase lets artists to mint thier tracks as coins and share them directly to their community. Fans can buy and hold these coins to support artist early, and unlock perks like unreleased drops, and future rewards. Artists monetize directly from their communities. Fans become real stakeholders, not just consumers.
+SynqBase enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans can discover music, directly buy, trade, and collect songs as assets, and share in the upside — creating transparent value and fair compensation for artists and community while building a new music economy where both sides benefit and connect more meaningfully.
 
 ## Features
 
-- **Tokenized Music Drops** - Artists launch tracks as coins to monetize directly from their fans.
+- **Tokenized Song Drops** - Artists can launch their songs as tokenized music coins to earn directly from their fans — no middlemen.
 
-- **Fan Investment** - Fans buy music coins to support artists and gain exposure to their growth.
+- **Buy, Trade & Own Music Coins** - Fans can invest in songs they love and directly support artists they believe in.
 
-- **Revenue & Ownership Sharing** - Real value flows back to the community — no middlemen.
+- **Built-In Royalties and Rewards** - Automated and transparent earnings for artists, plus perks, early drops, and exclusive content for fans.
 
-- **Exclusive Access** Get gated drops, early releases, and private fan experiences.
+- **Artists & Fan Profiles** - Track releases, collections, follow and build real connections between fans and artists.
 
-- **On-chain Social Profiles** Transparent, social engagement layer for both fans and artists.
+- **Asset Portfolio Tracking** - Track your holdings, activity and grow your valuable digital asset collections.
+
+- **Seamless Onboarding** - Easily sign in with your wallet for a smooth user experience — powered by Privy.
 
 ## How it Works
 
 ### For Artists:
 
-1. Sign up with Privy and set up a profile.
-2. Upload your track and add basic metadata.
-3. Mint your track as Zora coin.
-4. Share the coin drop, with your fans, and get paid
+1. Sign up with Privy and set up your profile.
+2. Upload your track and add metadata.
+3. Mint your song as tokenised coin on Zora.
+4. Launch your drop with your fans, and monitize your music
 
 ### For Fans:
 
-1. Discover new tokenized tracks from emerging artists.
-2. Buy music coins to support the artists you believe in.
-3. Unlock exclusive drops and releases.
-4. Track your holdings and grow with the artists you support.
+1. Discover unique music and new drops from your favorite artists.
+2. Buy music coins to directly support artists you believe in.
+3. Build real coonection wih artist communities anf follow your favorites.
+4. Track your holdings, gain your music asset collection, and potentially gain value.
 
 ## Tech Stack
 
@@ -59,7 +62,7 @@ SynqBase lets artists to mint thier tracks as coins and share them directly to t
 
 ## Zora Protocol Integration
 
-SynqBase is built directly on top of Zora’s CoinV4 contract using the official SDK. Artists tokenize each track as a coin. This enables track ownership, tradability, and community monetization using Zora’s infrastructure.
+SynqBase is built directly on top of Zora’s CoinV4 contract using the official SDK. Artists tokenize each song as a coin. This enables track ownership, tradability, and community monetization using Zora’s infrastructure.
 
 ## Project Structure
 
