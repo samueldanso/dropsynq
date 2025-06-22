@@ -7,6 +7,7 @@ export const env = createEnv({
 		SUPABASE_SERVICE_KEY: z.string(),
 		PINATA_JWT: z.string(),
 		ZORA_API_KEY: z.string(),
+		PRIVY_APP_SECRET: z.string(),
 	},
 	client: {
 		NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -22,6 +23,7 @@ export const env = createEnv({
 		SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 		PINATA_JWT: process.env.PINATA_JWT,
 		ZORA_API_KEY: process.env.ZORA_API_KEY,
+		PRIVY_APP_SECRET: process.env.PRIVY_APP_SECRET,
 		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
 		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
 		NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
