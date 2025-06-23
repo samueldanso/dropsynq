@@ -6,7 +6,7 @@ import { FollowButton } from "@/components/shared/follow-button";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { useProfileBalances } from "@/hooks/use-profile-balances";
 import { formatAddress } from "@/lib/utils";
-import { ZoraProfile } from "@/types/profile";
+import type { ZoraProfile } from "@/types/profile";
 import { EditProfileDialog } from "./edit-profile-dialog";
 
 interface ProfileHeaderProps {
@@ -57,14 +57,18 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
 					</div>
 				</div>
 				<div className="flex flex-col items-center">
-					<span className="font-semibold text-foreground text-xl">{followingCount}</span>
+					<span className="font-semibold text-foreground text-xl">
+						{followingCount}
+					</span>
 					<div className="flex items-center gap-1 text-sm">
 						<UserPlus className="size-3" />
 						<span>Following</span>
 					</div>
 				</div>
 				<div className="flex flex-col items-center">
-					<span className="font-semibold text-foreground text-xl">{followersCount}</span>
+					<span className="font-semibold text-foreground text-xl">
+						{followersCount}
+					</span>
 					<div className="flex items-center gap-1 text-sm">
 						<Users className="size-3" />
 						<span>Followers</span>
@@ -77,7 +81,9 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
 				{isOwnProfile ? (
 					<EditProfileDialog profile={profile} />
 				) : (
-					profile.publicWallet.address && <FollowButton userId={profile.publicWallet.address} />
+					profile.publicWallet.address && (
+						<FollowButton userId={profile.publicWallet.address} />
+					)
 				)}
 			</div>
 		</div>

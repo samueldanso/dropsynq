@@ -14,7 +14,10 @@ async function apiFetch<TData>(endpoint: string): Promise<TData> {
 export function useApiQuery<TData, TSelect = TData>(
 	queryKey: unknown[],
 	endpoint: string,
-	options?: Omit<UseQueryOptions<TData, Error, TSelect>, "queryKey" | "queryFn">,
+	options?: Omit<
+		UseQueryOptions<TData, Error, TSelect>,
+		"queryKey" | "queryFn"
+	>,
 ) {
 	return useQuery<TData, Error, TSelect>({
 		queryKey,

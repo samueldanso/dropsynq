@@ -15,7 +15,11 @@ export function useApiMutation<TData = unknown, TVariables = unknown>({
 	endpoint,
 	method,
 	options,
-}: UseApiMutationProps<TData, TVariables>): UseMutationResult<TData, Error, TVariables> {
+}: UseApiMutationProps<TData, TVariables>): UseMutationResult<
+	TData,
+	Error,
+	TVariables
+> {
 	const { getAccessToken } = usePrivy();
 
 	const mutationFn = async (variables: TVariables) => {
@@ -40,7 +44,10 @@ export function useApiMutation<TData = unknown, TVariables = unknown>({
 			throw new Error(errorBody.message || "API request failed");
 		}
 
-		if (response.status === 204 || response.headers.get("Content-Length") === "0") {
+		if (
+			response.status === 204 ||
+			response.headers.get("Content-Length") === "0"
+		) {
 			return null as TData;
 		}
 

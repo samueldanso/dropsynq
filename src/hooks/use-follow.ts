@@ -11,7 +11,9 @@ export function useFollow(followeeAddress: string) {
 		options: {
 			onSuccess: (data: any) => {
 				toast.success(
-					data.data.status === "followed" ? "Successfully followed" : "Successfully unfollowed",
+					data.data.status === "followed"
+						? "Successfully followed"
+						: "Successfully unfollowed",
 				);
 				queryClient.invalidateQueries({
 					queryKey: ["isFollowing", undefined, followeeAddress],

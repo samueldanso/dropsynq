@@ -20,7 +20,11 @@ function FollowingUser({ address }: { address: string }) {
 	return (
 		<Link href={`/profile/${profile.handle || profile.publicWallet.address}`}>
 			<div className="flex items-center gap-2 rounded-md p-2 hover:bg-muted">
-				<UserAvatar src={profile.avatar?.medium} alt={profile.displayName || "User"} size="sm" />
+				<UserAvatar
+					src={profile.avatar?.medium}
+					alt={profile.displayName || "User"}
+					size="sm"
+				/>
 				<div>
 					<p className="font-semibold">{profile.displayName}</p>
 					<p className="text-muted-foreground text-sm">
@@ -38,7 +42,9 @@ export function FollowingList({ address }: { address: string }) {
 	if (isLoading) return <div className="p-4">Loading...</div>;
 
 	if (isError) {
-		return <div className="p-4 text-destructive">Failed to load following list.</div>;
+		return (
+			<div className="p-4 text-destructive">Failed to load following list.</div>
+		);
 	}
 
 	if (!following || following.length === 0) {

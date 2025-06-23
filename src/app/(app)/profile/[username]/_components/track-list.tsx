@@ -1,40 +1,27 @@
 // This component will be a list of tracks specifically for the profile page.
 
-import { useProfileBalances } from "@/hooks/use-profile-balances";
-import { type CoinBalance } from "@/types/coin";
+import { TrackCard } from "@/components/shared/track-card";
+import { useProfileCoins } from "@/hooks/use-profile-coins";
 
 interface TrackListProps {
-  address: string;
+	address: string;
 }
 
 export function TrackList({ address }: TrackListProps) {
-  const { data: balances, isLoading, isError } = useProfileBalances(address);
+	const { data: coins, isLoading, isError } = useProfileCoins(address);
 
-  if (isLoading) return <div className="p-4">Loading drops...</div>;
-  if (isError)
-    return <div className="p-4 text-destructive">Failed to load drops.</div>;
+	if (isLoading) return <div className="p-4">Loading tracks...</div>;
+	if (isError)
+		return <div className="p-4 text-destructive">Failed to load tracks.</div>;
 
-  // TODO: Filter for user's own drops when we have creator tracking
-  // For now, show all coins the user has balances for
-  const drops = balances?.filter(
-    (balance) => balance.coin && balance.amount.amountDecimal > 0
-  );
+	if (!coins || coins.length === 0)
+		return <div className="p-4">No tracks found.</div>;
 
-  if (!drops || drops.length === 0)
-    return <div className="p-4">No drops found.</div>;
-
-  return (
-    <div className="space-y-2 p-4">
-      {drops.map((balance: CoinBalance) => (
-        <div key={balance.id} className="rounded border p-2">
-          <div className="font-semibold">
-            {balance.coin?.name} ({balance.coin?.symbol})
-          </div>
-          <div className="text-muted-foreground text-sm">
-            Amount: {balance.amount.amountDecimal.toFixed(2)}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+	return (
+		<div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+			{coins.map((coin) => (
+				<TrackCard key={coin.id} coin={coin} />
+			))}
+		</div>
+	);
 }
