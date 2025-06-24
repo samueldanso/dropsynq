@@ -1,6 +1,8 @@
 import { validateMetadataJSON } from "@zoralabs/coins-sdk";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { tracks } from "@/lib/db/schemas/tracks";
 import { uploadFileToIPFS } from "@/lib/pinata";
 import { createSongCoin } from "@/lib/zora/create-coin";
 
@@ -113,15 +115,34 @@ export async function POST(request: NextRequest) {
 			payoutRecipient: validatedData.payoutRecipient as `0x${string}`,
 		});
 
-		if (!coinResult.success) {
-			return NextResponse.json({ error: coinResult.error }, { status: 500 });
+		if (!coinResult.success || !coinResult.address) {
+			return NextResponse.json(
+				{ error: coinResult.error || "Failed to create coin" },
+				{ status: 500 },
+			);
+		}
+
+		// Step 7: Save track data to our database
+		try {
+			await db.insert(tracks).values({
+				name: validatedData.name,
+				description: validatedData.description,
+				image_url: metadata.image,
+				audio_url: metadata.animation_url,
+				metadata_url: `ipfs://${metadataUpload.cid}`,
+				coin_address: coinResult.address,
+				creator_address: validatedData.payoutRecipient,
+			});
+		} catch (dbError) {
+			// If DB write fails, it's not a critical error for the user
+			// Log it for monitoring, but don't fail the request
+			console.error("Failed to save track to database:", dbError);
 		}
 
 		return NextResponse.json({
 			success: true,
 			coinAddress: coinResult.address,
 			transactionHash: coinResult.hash,
-			metadataUri: `ipfs://${metadataUpload.cid}`,
 		});
 	} catch (error) {
 		console.error("Error creating song coin:", error);
