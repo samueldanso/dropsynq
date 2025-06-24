@@ -7,9 +7,14 @@ import { useProfile } from "@/hooks/use-profile";
 import { ProfileHeader } from "./_components/profile-header";
 import { ProfileTabs } from "./_components/profile-tabs";
 
-export default function ProfilePage() {
+interface ProfilePageProps {
+	params: {
+		username: string;
+	};
+}
+
+export default function ProfilePage({ params }: ProfilePageProps) {
 	const { address } = useAccount();
-	const params = useParams();
 	const username = params?.username as string | undefined;
 	const identifier = username || address || "";
 	const { data: profile, isLoading } = useProfile(identifier);
@@ -31,9 +36,11 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="flex h-full flex-col">
-			<ProfileHeader profile={profile} />
-			<ProfileTabs profile={profile} />
+		<div className="container mx-auto py-8">
+			<ProfileHeader username={params.username} />
+			<div className="mt-8">
+				<ProfileTabs username={params.username} />
+			</div>
 		</div>
 	);
 }

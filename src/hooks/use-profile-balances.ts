@@ -1,19 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProfileBalances } from "@zoralabs/coins-sdk";
+import { useApiQuery } from "@/hooks/use-api-query";
 import type { CoinBalance } from "@/types/coin";
 
-export function useProfileBalances(identifier: string) {
-	return useQuery<CoinBalance[]>({
-		queryKey: ["profile-balances", identifier],
-		queryFn: async () => {
-			const response = (await getProfileBalances({ identifier })) as any;
-			// The balances are in response.data?.profile.coinBalances?.edges
-			return (
-				response.data?.profile?.coinBalances?.edges.map(
-					(edge: any) => edge.node,
-				) || []
-			);
+export function useProfileBalances(username: string) {
+	return useApiQuery<CoinBalance[]>(
+		["profile-balances", username],
+		`/api/user/balances/${username}`,
+		{
+			enabled: !!username,
 		},
-		enabled: Boolean(identifier),
-	});
+	);
 }
