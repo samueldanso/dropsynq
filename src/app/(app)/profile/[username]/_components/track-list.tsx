@@ -10,7 +10,7 @@ interface TrackListProps {
 }
 
 export function TrackList({ username }: TrackListProps) {
-	const { data: tracks, isLoading } = useProfileTracks(username);
+	const { data: coins, isLoading } = useProfileTracks(username);
 
 	if (isLoading) {
 		return (
@@ -22,7 +22,7 @@ export function TrackList({ username }: TrackListProps) {
 		);
 	}
 
-	if (!tracks || tracks.length === 0) {
+	if (!coins || coins.length === 0) {
 		return (
 			<div className="flex items-center justify-center p-8 text-center text-muted-foreground">
 				<p>This user hasn't created any tracks yet.</p>
@@ -32,8 +32,8 @@ export function TrackList({ username }: TrackListProps) {
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-			{tracks.map((track) => (
-				<TrackCard key={track.id} coin={track} />
+			{coins.map((coin) => (
+				<TrackCard key={coin.address} coin={coin} />
 			))}
 		</div>
 	);

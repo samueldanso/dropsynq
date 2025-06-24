@@ -1,8 +1,8 @@
 import { useApiQuery } from "@/hooks/use-api-query";
-import type { Track } from "@/types/track";
+import type { ZoraCoin } from "@/types/coin";
 
 export function useProfileTracks(username: string) {
-	return useApiQuery<Track[]>(
+	return useApiQuery<ZoraCoin[]>(
 		["profile-tracks", username],
 		`/api/user/tracks/${username}`,
 		{
