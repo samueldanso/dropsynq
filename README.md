@@ -1,10 +1,10 @@
 <a href="https://dropsynq.xyz">
-  <img alt="DropSynq – Tokenise, Connect & Monetize your FanBase" src="https://raw.githubusercontent.com/samueldanso/SynqBase/main/public/images/banner.png">
-  <h1 align="center">SynqBase</h1>
+  <img alt="DropSynq" src="./public/images/og.png">
+  <h1 align="center">DropSynq</h1>
 </a>
 
 <p align="center">
-DropSynq is a SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. Built on Zora, it lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music.
+  a SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. It lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music. Built on Zora.
 </p>
 
 ## Problem
@@ -13,16 +13,16 @@ Artists struggle to monetize directly, with traditonal streaming platforms takin
 
 ## Solution
 
-DropSynq enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans can discover, buy, trade, and collect songs as assets while sharing in the upside — creating a new music economy where both artists and fans benefit.
+DropSynq enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans discover, buy, trade, and collect songs as assets while sharing in the upside — creating a new music economy where both artists and fans benefit.
 
 ## Features
 
-- **Tokenized Song Drops** - Artists can launch their songs as tokenized music coins to earn directly from their fans — no middlemen.
-- **Buy, Trade & Own Music Coins** - Fans can invest in songs they love and directly support artists they believe in.
-- **Built-In Royalties and Rewards** - Automated and transparent earnings for artists, plus perks, early drops, and exclusive content for fans.
-- **Artists & Fan Profiles** - Track releases, collections, follow and build real connections between fans and artists.
-- **Asset Portfolio Tracking** - Track your holdings, activity and grow your valuable digital asset collections.
-- **Seamless Onboarding** - Easily sign in with your wallet for a smooth user experience — powered by Privy.
+- **🎵 Tokenized Song Drops** - Launch songs as tokenized music coins to earn directly from fans
+- **💱 Trade & Own Music Coins** - Fans can invest in songs they love and directly support artists they believe in.
+- **💰 Royalties and Rewards** - Automated earnings for artists, plus early drops, and exclusive content for fans
+- **👥 Artists & Fan Profiles** - Track releases, collections, follow and build real connections between fans and artists
+- **📊 Asset Portfolio Tracking** - Track your holdings, activity and grow your valuable digital asset collections
+- **💼 Seamless Onboarding** - Easily sign in with your wallet for a smooth user experience — powered by Privy
 
 ## How it Works
 
