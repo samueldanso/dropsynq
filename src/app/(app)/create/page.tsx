@@ -5,9 +5,9 @@ export default function CreatePage() {
 		<div className="container mx-auto py-8">
 			<div className="mx-auto max-w-4xl">
 				<div className="mb-8 text-center">
-					<h1 className="mb-4 font-bold text-4xl">Create Your Track</h1>
+					<h1 className="mb-4 font-bold text-4xl">Create Your Song Coin</h1>
 					<p className="text-lg text-muted-foreground">
-						Upload your music and launch it as a tokenized coin on Zora
+						Upload your song and launch it as a tokenized coin on Zora
 					</p>
 				</div>
 

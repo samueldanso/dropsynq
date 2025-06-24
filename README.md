@@ -21,7 +21,7 @@ Fans can discover, buy, trade, and collect songs as assets — creating a new mu
 
 - **🎵 Tokenized Song Drops** - Launch songs as music coins and earn directly from your fans.
 - **💱 Trade & Own Music Coins** - Fans can invest in songs they love and directly support artists they believe in.
-- **💰 Royalties and Rewards** - Artists earn automatically. Fans get early access, exclusive content, and upside potential.
+- **💰 Royalties and Rewards** - Artists earn automatically. Fans get early access, exclusive content, and upside.
 - **👥 Artists & Fan Profiles** - Showcase drops, collections, and build real connections between fans and artists.
 - **📊 Asset Portfolio Tracking** - View your holdings, activity, and build a valuable music asset collection.
 - **💼 Seamless Onboarding** - Simple, secure login with wallets — powered by Privy.

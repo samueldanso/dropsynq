@@ -1,262 +1,270 @@
 "use client";
 
-import { Image as ImageIcon, Loader2, Music, Upload } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useId, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useAccount } from "wagmi";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
+// Form validation schema - minimal required fields
+const createSongSchema = z.object({
+	name: z.string().min(1, "Name is required"),
+	description: z.string().min(1, "Description is required"),
+	creator: z.string().min(1, "Creator is required"),
+	genre: z.string().min(1, "Genre is required"),
+	payoutRecipient: z.string().min(42, "Valid wallet address required"),
+});
+
+type CreateSongFormData = z.infer<typeof createSongSchema>;
+
 export default function CreateForm() {
-	// Track creation state
-	const [trackName, setTrackName] = useState("");
-	const [symbol, setSymbol] = useState("");
-	const [description, setDescription] = useState("");
-	const [audioFile, setAudioFile] = useState<File | null>(null);
-	const [coverImage, setCoverImage] = useState<File | null>(null);
-	const [isCreatingTrack, setIsCreatingTrack] = useState(false);
+	const audioFileId = useId();
+	const coverImageId = useId();
+	const [audioFile, setAudioFile] = useState<File>();
+	const [coverImage, setCoverImage] = useState<File>();
+	const [isUploading, setIsUploading] = useState(false);
 
-	// Generate unique IDs
-	const trackNameId = useId();
-	const symbolId = useId();
-	const descriptionId = useId();
-	const audioId = useId();
-	const coverId = useId();
+	const form = useForm<CreateSongFormData>({
+		resolver: zodResolver(createSongSchema),
+		defaultValues: {
+			name: "",
+			description: "",
+			creator: "",
+			genre: "",
+			payoutRecipient: "",
+		},
+	});
 
-	const { address } = useAccount();
-	const router = useRouter();
-
-	// New track creation functions
-	const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (file) {
-			if (file.size > 50 * 1024 * 1024) {
-				toast.error("Audio file must be less than 50MB");
-				return;
-			}
-			setAudioFile(file);
-		}
-	};
-
-	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (file) {
-			if (file.size > 5 * 1024 * 1024) {
-				toast.error("Image file must be less than 5MB");
-				return;
-			}
-			setCoverImage(file);
-		}
-	};
-
-	const fileToBase64 = (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onload = () => {
-				const result = reader.result as string;
-				const base64 = result.split(",")[1];
-				resolve(base64);
-			};
-			reader.onerror = reject;
-		});
-	};
-
-	const createTrack = async () => {
-		if (!address) {
-			toast.error("Please connect your wallet");
+	const onSubmit = async (data: CreateSongFormData) => {
+		if (!audioFile || !coverImage) {
+			toast.error("Please select both audio file and cover image");
 			return;
 		}
 
-		if (!audioFile) {
-			toast.error("Please select an audio file");
-			return;
-		}
-
-		if (!trackName || !symbol || !description) {
-			toast.error("Please fill in all required fields");
-			return;
-		}
-
-		setIsCreatingTrack(true);
+		setIsUploading(true);
 
 		try {
-			const audioBase64 = await fileToBase64(audioFile);
-			const imageBase64 = coverImage
-				? await fileToBase64(coverImage)
-				: undefined;
+			const formData = new FormData();
 
-			const requestData = {
-				name: trackName,
-				symbol: symbol.toUpperCase(),
-				description,
-				audioFile: audioBase64,
-				coverImage: imageBase64,
-			};
+			// Add form fields
+			Object.entries(data).forEach(([key, value]) => {
+				if (value) formData.append(key, value);
+			});
 
-			const response = await fetch("/api/tracks/create", {
+			// Add files
+			formData.append("audioFile", audioFile);
+			formData.append("coverImage", coverImage);
+
+			const response = await fetch("/api/songs/create", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(requestData),
+				body: formData,
 			});
 
 			const result = await response.json();
 
 			if (!response.ok) {
-				throw new Error(result.error || "Failed to create track");
+				throw new Error(result.error || "Failed to create song coin");
 			}
 
-			toast.success("Track created successfully!");
-			router.push(`/track/${result.coin.address}`);
+			toast.success("Song coin created successfully!");
+			console.log("Coin address:", result.coinAddress);
+			console.log("Transaction hash:", result.transactionHash);
+
+			// Reset form
+			form.reset();
+			setAudioFile(undefined);
+			setCoverImage(undefined);
 		} catch (error) {
-			console.error("Error creating track:", error);
+			console.error("Error creating song coin:", error);
 			toast.error(
-				error instanceof Error ? error.message : "Failed to create track",
+				error instanceof Error ? error.message : "Failed to create song coin",
 			);
 		} finally {
-			setIsCreatingTrack(false);
+			setIsUploading(false);
+		}
+	};
+
+	const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file && file.type.startsWith("audio/")) {
+			setAudioFile(file);
+		} else {
+			toast.error("Please select a valid audio file");
+		}
+	};
+
+	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file && file.type.startsWith("image/")) {
+			setCoverImage(file);
+		} else {
+			toast.error("Please select a valid image file");
 		}
 	};
 
 	return (
-		<div className="container mx-auto py-8">
-			<div className="mx-auto max-w-4xl space-y-8">
-				{/* Track Creation Form */}
-				<Card>
-					<CardHeader>
-						<CardTitle>Create New Track</CardTitle>
-						<CardDescription>
-							Upload your music and create a tokenized coin on Zora
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-6">
-						{/* Track Name */}
-						<div className="space-y-2">
-							<Label htmlFor={trackNameId}>Track Name *</Label>
-							<Input
-								id={trackNameId}
-								value={trackName}
-								onChange={(e) => setTrackName(e.target.value)}
-								placeholder="Enter track name"
-								disabled={isCreatingTrack}
-							/>
-						</div>
+		<div className="w-full max-w-2xl mx-auto">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					{/* Song Name */}
+					<FormField
+						control={form.control}
+						name="name"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Song Title</FormLabel>
+								<FormControl>
+									<Input placeholder="Enter song title" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						{/* Symbol */}
-						<div className="space-y-2">
-							<Label htmlFor={symbolId}>Symbol *</Label>
-							<Input
-								id={symbolId}
-								value={symbol}
-								onChange={(e) => setSymbol(e.target.value)}
-								placeholder="e.g., SONG"
-								maxLength={10}
-								disabled={isCreatingTrack}
-							/>
-						</div>
+					{/* Creator */}
+					<FormField
+						control={form.control}
+						name="creator"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Artist</FormLabel>
+								<FormControl>
+									<Input placeholder="Enter artist name" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						{/* Description */}
-						<div className="space-y-2">
-							<Label htmlFor={descriptionId}>Description *</Label>
-							<Textarea
-								id={descriptionId}
-								value={description}
-								onChange={(e) => setDescription(e.target.value)}
-								placeholder="Describe your track..."
-								rows={3}
-								disabled={isCreatingTrack}
-							/>
-						</div>
+					{/* Description */}
+					<FormField
+						control={form.control}
+						name="description"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Description</FormLabel>
+								<FormControl>
+									<Textarea
+										placeholder="Describe your song..."
+										className="min-h-[100px]"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						{/* Audio File Upload */}
-						<div className="space-y-2">
-							<Label htmlFor={audioId}>Audio File *</Label>
-							<div className="rounded-lg border-2 border-muted-foreground/25 border-dashed p-6 text-center">
-								<input
-									id={audioId}
-									type="file"
-									accept="audio/*"
-									onChange={handleAudioChange}
-									disabled={isCreatingTrack}
-									className="hidden"
-								/>
-								<label htmlFor={audioId} className="cursor-pointer">
-									<Music className="mx-auto mb-2 size-8 text-muted-foreground" />
-									<p className="text-muted-foreground text-sm">
-										{audioFile ? audioFile.name : "Click to upload audio file"}
-									</p>
-									<p className="mt-1 text-muted-foreground text-xs">
-										MP3, WAV, or FLAC (max 50MB)
-									</p>
-								</label>
-							</div>
-						</div>
+					{/* Genre */}
+					<FormField
+						control={form.control}
+						name="genre"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Genre</FormLabel>
+								<Select
+									onValueChange={field.onChange}
+									defaultValue={field.value}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select genre" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										<SelectItem value="Electronic">Electronic</SelectItem>
+										<SelectItem value="Hip Hop">Hip Hop</SelectItem>
+										<SelectItem value="Rock">Rock</SelectItem>
+										<SelectItem value="Pop">Pop</SelectItem>
+										<SelectItem value="Jazz">Jazz</SelectItem>
+										<SelectItem value="Classical">Classical</SelectItem>
+										<SelectItem value="Country">Country</SelectItem>
+										<SelectItem value="R&B">R&B</SelectItem>
+										<SelectItem value="Other">Other</SelectItem>
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						{/* Cover Image Upload */}
-						<div className="space-y-2">
-							<Label htmlFor={coverId}>Cover Image (Optional)</Label>
-							<div className="rounded-lg border-2 border-muted-foreground/25 border-dashed p-6 text-center">
-								<input
-									id={coverId}
-									type="file"
-									accept="image/*"
-									onChange={handleImageChange}
-									disabled={isCreatingTrack}
-									className="hidden"
-								/>
-								<label htmlFor={coverId} className="cursor-pointer">
-									<ImageIcon className="mx-auto mb-2 size-8 text-muted-foreground" />
-									<p className="text-muted-foreground text-sm">
-										{coverImage
-											? coverImage.name
-											: "Click to upload cover image"}
-									</p>
-									<p className="mt-1 text-muted-foreground text-xs">
-										JPG, PNG, or GIF (max 5MB)
-									</p>
-								</label>
-							</div>
-						</div>
+					{/* Payout Recipient */}
+					<FormField
+						control={form.control}
+						name="payoutRecipient"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Payout Wallet Address</FormLabel>
+								<FormControl>
+									<Input placeholder="0x..." {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						{/* Create Track Button */}
-						<Button
-							onClick={createTrack}
-							disabled={isCreatingTrack || !address}
-							className="w-full"
-						>
-							{isCreatingTrack ? (
-								<>
-									<Loader2 className="mr-2 size-4 animate-spin" />
-									Creating Track...
-								</>
-							) : (
-								<>
-									<Upload className="mr-2 size-4" />
-									Create Track
-								</>
-							)}
-						</Button>
-
-						{!address && (
-							<p className="text-center text-muted-foreground text-sm">
-								Please connect your wallet to create a track
+					{/* Audio File Upload */}
+					<div className="space-y-2">
+						<label htmlFor={audioFileId} className="text-sm font-medium">
+							Audio File
+						</label>
+						<Input
+							id={audioFileId}
+							type="file"
+							accept="audio/*"
+							onChange={handleAudioChange}
+							className="cursor-pointer"
+						/>
+						{audioFile && (
+							<p className="text-sm text-muted-foreground">
+								Selected: {audioFile.name}
 							</p>
 						)}
-					</CardContent>
-				</Card>
-			</div>
+					</div>
+
+					{/* Cover Image Upload */}
+					<div className="space-y-2">
+						<label htmlFor={coverImageId} className="text-sm font-medium">
+							Cover Image
+						</label>
+						<Input
+							id={coverImageId}
+							type="file"
+							accept="image/*"
+							onChange={handleImageChange}
+							className="cursor-pointer"
+						/>
+						{coverImage && (
+							<p className="text-sm text-muted-foreground">
+								Selected: {coverImage.name}
+							</p>
+						)}
+					</div>
+
+					{/* Submit Button */}
+					<Button type="submit" className="w-full" disabled={isUploading}>
+						{isUploading ? "Creating Song Coin..." : "Create Song Coin"}
+					</Button>
+				</form>
+			</Form>
 		</div>
 	);
 }
