@@ -1,14 +1,11 @@
 import { getProfileBalances } from "@zoralabs/coins-sdk";
 import { NextResponse } from "next/server";
 
-interface RouteContext {
-  params: {
-    username: string;
-  };
-}
-
-export async function GET(_request: Request, { params }: RouteContext) {
-  const { username } = params;
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ username: string }> }
+) {
+  const { username } = await params;
 
   try {
     const response = await getProfileBalances({ identifier: username });
