@@ -7,7 +7,7 @@ import {
   createWalletClient,
   http,
 } from "viem";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { env } from "@/env";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -34,11 +34,11 @@ export async function createSongCoin(params: CreateSongCoinParams) {
     // 3. Create clients with the derived account
     const walletClient = createWalletClient({
       account,
-      chain: base,
+      chain: baseSepolia,
       transport: http(),
     });
     const publicClient = createPublicClient({
-      chain: base,
+      chain: baseSepolia,
       transport: http(),
     });
 
@@ -51,8 +51,8 @@ export async function createSongCoin(params: CreateSongCoinParams) {
       platformReferrer:
         params.platformReferrer ||
         ("0x0000000000000000000000000000000000000000" as Address),
-      chainId: base.id,
-      currency: DeployCurrency.ZORA, // Use ZORA on Base mainnet
+      chainId: baseSepolia.id,
+      currency: DeployCurrency.ETH, // Use ETH on Base Sepolia testnet
     };
 
     // 5. Call the SDK function
