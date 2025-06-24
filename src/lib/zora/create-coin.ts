@@ -21,12 +21,17 @@ export interface CreateSongCoinParams {
 
 export async function createSongCoin(params: CreateSongCoinParams) {
   try {
-    // 1. Create an account from the private key
-    const account = privateKeyToAccount(
-      env.WALLET_PRIVATE_KEY as `0x${string}`
-    );
+    // 1. Ensure the private key is correctly formatted with a '0x' prefix
+    const privateKey = (
+      env.WALLET_PRIVATE_KEY.startsWith("0x")
+        ? env.WALLET_PRIVATE_KEY
+        : `0x${env.WALLET_PRIVATE_KEY}`
+    ) as `0x${string}`;
 
-    // 2. Create clients with the derived account
+    // 2. Create an account from the formatted private key
+    const account = privateKeyToAccount(privateKey);
+
+    // 3. Create clients with the derived account
     const walletClient = createWalletClient({
       account,
       chain: base,
@@ -37,7 +42,7 @@ export async function createSongCoin(params: CreateSongCoinParams) {
       transport: http(),
     });
 
-    // 3. Prepare the coin creation parameters
+    // 4. Prepare the coin creation parameters
     const coinParams = {
       name: params.name,
       symbol: params.symbol,
@@ -50,7 +55,7 @@ export async function createSongCoin(params: CreateSongCoinParams) {
       currency: DeployCurrency.ZORA, // Use ZORA on Base mainnet
     };
 
-    // 4. Call the SDK function
+    // 5. Call the SDK function
     const result = await createCoin(coinParams, walletClient, publicClient, {
       gasMultiplier: 120, // Add 20% buffer to gas
     });
