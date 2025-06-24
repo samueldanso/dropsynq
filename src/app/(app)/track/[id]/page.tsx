@@ -4,8 +4,9 @@ import TrackDetails from "./_components/track-details";
 export default async function TrackPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  if (!params.id) return notFound();
-  return <TrackDetails id={params.id} />;
+  const { id } = await params;
+  if (!id) return notFound();
+  return <TrackDetails id={id} />;
 }
