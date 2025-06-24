@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ export default function CreateForm() {
 	const [audioFile, setAudioFile] = useState<File>();
 	const [coverImage, setCoverImage] = useState<File>();
 	const [isUploading, setIsUploading] = useState(false);
+	const router = useRouter();
 
 	const form = useForm<CreateSongFormData>({
 		resolver: zodResolver(createSongSchema),
@@ -87,6 +89,11 @@ export default function CreateForm() {
 			toast.success("Song coin created successfully!");
 			console.log("Coin address:", result.coinAddress);
 			console.log("Transaction hash:", result.transactionHash);
+
+			// Redirect to the new track page
+			if (result.coinAddress) {
+				router.push(`/track/${result.coinAddress}`);
+			}
 
 			// Reset form
 			form.reset();
