@@ -4,41 +4,43 @@
 </a>
 
 <p align="center">
-  A SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. It lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music. Built on Zora.
+A SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. It lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music. Built on Zora.
 </p>
 
 ## Problem
 
-Artists struggle to monetize directly, with traditonal streaming platforms taking large cuts and offering little control and ownership. Fans have no direct way to invest in or own the music they love, or share in artists' success — they're just passive listeners.
+Artists struggle to monetize directly — traditional streaming platforms take large cuts and offer little control or ownership.
+Fans have no direct way to invest in or own the music they love, or share in artists’ success — they’re just passive listeners.
 
 ## Solution
 
-DropSynq enables artists to mint their songs as tokenized music coins on Zora, providing direct-to-fan monetization. Fans discover, buy, trade, and collect songs as assets while sharing in the upside — creating a new music economy where both artists and fans benefit.
+DropSynq enables artists to mint their songs as tokenized music coins on Zora, unlocking direct-to-fan monetization.
+Fans can discover, buy, trade, and collect songs as assets — creating a new music economy where both artists and fans benefit.
 
 ## Features
 
-- **🎵 Tokenized Song Drops** - Launch songs as tokenized music coins and earn directly from fans
+- **🎵 Tokenized Song Drops** - Launch songs as music coins and earn directly from your fans.
 - **💱 Trade & Own Music Coins** - Fans can invest in songs they love and directly support artists they believe in.
-- **💰 Royalties and Rewards** - Automated earnings for artists, plus early drops, and exclusive content for fans
-- **👥 Artists & Fan Profiles** - Track releases, collections, follow and build real connections between fans and artists
-- **📊 Asset Portfolio Tracking** - Track your holdings, activity and grow your valuable digital asset collections
-- **💼 Seamless Onboarding** - Easily sign in with your wallet for a smooth user experience — powered by Privy
+- **💰 Royalties and Rewards** - Artists earn automatically. Fans get early access, exclusive content, and upside potential.
+- **👥 Artists & Fan Profiles** - Showcase drops, collections, and build real connections between fans and artists.
+- **📊 Asset Portfolio Tracking** - View your holdings, activity, and build a valuable music asset collection.
+- **💼 Seamless Onboarding** - Simple, secure login with wallets — powered by Privy.
 
 ## How it Works
 
 ### For Artists:
 
-1. Sign up with Privy and set up your profile.
-2. Upload your track and add metadata.
-3. Mint your song as tokenised coin on Zora.
-4. Launch your drop with your fans, and monitize your music
+1. Sign up with Privy and set up your artist profile.
+2. Upload your song and add metadata.
+3. Mint it as a coin using Zora Protocol.
+4. Launch your drop, earn from your fans, and grow your community.
 
 ### For Fans:
 
-1. Discover unique music and new drops from your favorite artists.
-2. Buy music coins to directly support artists you believe in.
-3. Build real coonection wih artist communities anf follow your favorites.
-4. Track your holdings, gain your music asset collection, and potentially gain value.
+1. Discover exclusive music drops and rising artists.
+2. Buy song coins to support artists you love
+3. Follow, engage, and connect with creators.
+4. Track your music assets and share in the upside.
 
 ## Tech Stack
 
