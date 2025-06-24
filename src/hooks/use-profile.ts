@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@zoralabs/coins-sdk";
-import { ZoraProfile } from "@/types/profile";
+import type { ZoraProfile } from "@/types/profile";
 
 export function useProfile(identifier: string) {
 	return useQuery<ZoraProfile | undefined>({

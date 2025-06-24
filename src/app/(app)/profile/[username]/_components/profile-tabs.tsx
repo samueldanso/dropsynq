@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ZoraProfile } from "@/types/profile";
+import type { ZoraProfile } from "@/types/profile";
 import { Collections } from "./collections";
 import { FollowingList } from "./following-list";
 import { TrackList } from "./track-list";

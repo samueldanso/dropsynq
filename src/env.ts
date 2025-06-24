@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
+		WALLET_PRIVATE_KEY: z.string().min(1),
 		DATABASE_URL: z.string(),
 		SUPABASE_SERVICE_KEY: z.string(),
 		PINATA_JWT: z.string(),
@@ -19,13 +20,15 @@ export const env = createEnv({
 	},
 
 	runtimeEnv: {
+		WALLET_PRIVATE_KEY: process.env.WALLET_PRIVATE_KEY,
 		DATABASE_URL: process.env.DATABASE_URL,
 		SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 		PINATA_JWT: process.env.PINATA_JWT,
 		ZORA_API_KEY: process.env.ZORA_API_KEY,
 		PRIVY_APP_SECRET: process.env.PRIVY_APP_SECRET,
 		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
+			process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
 		NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
 		NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
 		NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

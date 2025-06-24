@@ -24,7 +24,9 @@ export function Sidebar() {
 	};
 
 	const profileHref =
-		ready && authenticated && user?.wallet ? `/profile/${user.wallet.address}` : "/";
+		ready && authenticated && user?.wallet
+			? `/profile/${user.wallet.address}`
+			: "/";
 
 	return (
 		<aside className="hidden h-full w-60 flex-col justify-between border-r bg-background p-4 md:flex">

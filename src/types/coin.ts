@@ -1,27 +1,47 @@
-export interface Coin {
+// Zora Coin data structure (matches Zora API response)
+export interface ZoraCoin {
 	id: string;
 	name: string;
 	symbol: string;
+	description: string;
 	address: string;
-	chainId: number;
 	totalSupply: string;
 	volume24h: string;
-	createdAt: string;
+	createdAt?: string;
+	creatorAddress?: string;
+	marketCap: string;
+	chainId: number;
+	tokenUri?: string;
 	uniqueHolders: number;
-	description?: string;
-	media?: {
-		previewImage?: string;
-		medium?: string;
-		blurhash?: string;
+	mediaContent?: {
+		mimeType?: string;
+		originalUri: string;
+		previewImage?: {
+			small: string;
+			medium: string;
+			blurhash?: string;
+		};
+	};
+	creatorProfile?: {
+		id: string;
+		handle: string;
+		avatar?: {
+			previewImage: {
+				blurhash?: string;
+				medium: string;
+				small: string;
+			};
+		};
 	};
 }
 
+// Coin balance for user holdings
 export interface CoinBalance {
 	id: string;
 	amount: {
 		amountRaw: string;
 		amountDecimal: number;
 	};
-	coin?: Coin;
+	coin?: ZoraCoin;
 	timestamp?: string;
 }

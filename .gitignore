@@ -42,3 +42,12 @@ next-env.d.ts
 
 /docs
 .cursor/
+
+# scripts
+/scripts
+
+# todo
+/todo
+
+# testing
+/testing

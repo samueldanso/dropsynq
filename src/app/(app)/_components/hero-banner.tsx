@@ -13,8 +13,8 @@ export default function HeroBanner() {
 						Turn music into coins. Discover, trade, and earn.
 					</h1>
 					<p className="mt-4 text-muted-foreground">
-						Launch tokenized songs and connect with fans — or explore music coins from rising
-						artists. All on Zora.
+						Launch tokenized songs and connect with fans — or explore music
+						coins from rising artists. All on Zora.
 					</p>
 					<div className="mt-6">
 						<Button

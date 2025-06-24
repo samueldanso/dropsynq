@@ -11,7 +11,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-	title: "DropSynq — A SocialFi music platform for artists and fans, built on Zora",
+	title: "DropSynq – A SocialFi music platform for artists & fans",
 	description:
 		"DropSynq is a SocialFi music platform where artists launch tokenized songs, and fans discover, trade, connect, and earn — all on Zora.",
 	icons: [{ rel: "icon", url: "/favicon.svg" }],
@@ -25,7 +25,12 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${manrope.variable} antialiased`}>
-				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="dark"
+					enableSystem
+					disableTransitionOnChange
+				>
 					<Providers>{children}</Providers>
 					<Toaster />
 				</ThemeProvider>
