@@ -7,14 +7,15 @@ import { tracks } from "@/lib/db/schemas/tracks";
 
 export async function GET(
 	_request: Request,
-	{ params }: { params: { username: string } },
+	{ params }: { params: Promise<{ username: string }> },
 ) {
-	const { username } = params;
+	const { username } = await params;
 
 	try {
 		// 1. Get the user's wallet address from their username
 		const profileResponse = await getProfile({ identifier: username });
-		const userAddress = profileResponse?.data?.profile?.address;
+		const userAddress =
+			profileResponse?.data?.profile?.publicWallet?.walletAddress;
 
 		if (!userAddress) {
 			return NextResponse.json({ error: "User not found" }, { status: 404 });
