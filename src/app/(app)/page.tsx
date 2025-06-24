@@ -1,13 +1,17 @@
-import HeroBanner from "./_components/hero-banner";
+import { CoinCarousel } from "./_components/coin-carousel";
+import HeroSection from "./_components/hero-section";
 
-export default function HomePage() {
+export default function AppHomePage() {
 	return (
-		<div className="space-y-4 p-4">
-			<HeroBanner />
-			<h1 className="font-bold text-2xl">Discover Feed</h1>
-			<p className="text-muted-foreground">
-				This is the main feed. It's public, but actions are protected.
-			</p>
+		<div className="container mx-auto">
+			<HeroSection />
+
+			<div className="my-12 space-y-12">
+				<CoinCarousel title="🚀 Newest Drops" type="newest" />
+				<CoinCarousel title="🔥 Top Gainers (24h)" type="top-gainers" />
+				<CoinCarousel title="💎 Most Valuable" type="most-valuable" />
+				<CoinCarousel title="📈 Top Volume (24h)" type="top-volume" />
+			</div>
 		</div>
 	);
 }
