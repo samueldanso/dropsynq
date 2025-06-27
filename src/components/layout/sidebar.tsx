@@ -2,7 +2,6 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { PanelLeftOpen } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -49,7 +48,7 @@ export function AppSidebar() {
           "w-16"
         )}
       >
-        <nav className="flex-1 px-2 pt-2">
+        <nav className="flex-1 px-2 pt-6">
           <div className="w-full space-y-2">
             {/* Toggle button as first nav item */}
             <button
@@ -100,7 +99,7 @@ export function AppSidebar() {
         "w-60"
       )}
     >
-      <div className="flex h-16 items-center px-2 gap-2">
+      <div className="flex h-16 items-center px-2 gap-2 mt-2">
         <Logo variant="sidebar" />
         <button
           type="button"
@@ -112,7 +111,7 @@ export function AppSidebar() {
         </button>
       </div>
       {/* Navigation Links */}
-      <nav className="flex-1 px-2 pt-2">
+      <nav className="flex-1 px-2 mt-4">
         <div className="w-full space-y-2">
           {navLinks.map((link) => {
             const isActive = link.isActive();
