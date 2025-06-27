@@ -99,7 +99,7 @@ export function AppSidebar() {
         "w-60"
       )}
     >
-      <div className="flex h-16 items-center px-2 gap-2 mt-2">
+      <div className="flex h-16 items-center px-2 gap-2">
         <Logo variant="sidebar" />
         <button
           type="button"
