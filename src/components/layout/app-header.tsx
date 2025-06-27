@@ -8,7 +8,6 @@ import { SearchBar } from "@/components/shared/search-bar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Logo } from "./logo";
 import { AppSidebar } from "./sidebar";
 
 // Upload Button Component
@@ -112,9 +111,6 @@ export function AppHeader() {
     return (
       <header className="flex h-14 w-full items-center justify-between bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         {/* Left: Logo */}
-        <Logo variant="header" />
-
-        {/* Right: Upload, Notifications, Profile */}
         <div className="flex items-center gap-2">
           <UploadButton />
           <NotificationsButton />
@@ -152,18 +148,15 @@ export function AppHeader() {
   return (
     <header className="flex h-14 w-full items-center bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Left: Logo */}
-      <Logo variant="header" />
+      <div className="flex items-center gap-2">
+        <UploadButton />
+        <NotificationsButton />
+        <UserProfileAvatar />
+      </div>
 
       {/* Center: Search Bar */}
       <div className="mx-6 max-w-sm flex-1">
         <SearchBar />
-      </div>
-
-      {/* Right: Upload, Notifications & Profile Avatar */}
-      <div className="flex flex-1 items-center justify-end gap-3">
-        <UploadButton />
-        <NotificationsButton />
-        <UserProfileAvatar />
       </div>
     </header>
   );
