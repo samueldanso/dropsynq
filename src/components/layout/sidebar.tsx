@@ -12,7 +12,6 @@ import PersonIcon from "@/components/icons/person.svg";
 import PersonFillIcon from "@/components/icons/personFill.svg";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { ThemeToggle } from "./theme-toggle";
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -97,15 +96,6 @@ export function AppSidebar() {
           })}
         </div>
       </nav>
-      {/* Bottom section: Theme Toggle */}
-      <div
-        className={cn(
-          "px-2 pb-4 mt-auto",
-          collapsed && "flex justify-center px-0"
-        )}
-      >
-        <ThemeToggle />
-      </div>
     </div>
   );
 }
