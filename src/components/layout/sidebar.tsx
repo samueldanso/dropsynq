@@ -1,101 +1,122 @@
 "use client";
 
 import { usePrivy } from "@privy-io/react-auth";
-import { Home, PlusSquare, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-	SidebarContent,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarProvider,
-	SidebarTrigger,
-	Sidebar as UISidebar,
-} from "@/components/ui/sidebar";
+import HomeIcon from "public/icons/home.svg";
+import HomeFillIcon from "public/icons/homeFill.svg";
+import PersonIcon from "public/icons/person.svg";
+import PersonFillIcon from "public/icons/personFill.svg";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
 
-const links = [{ href: "/", label: "Home", icon: Home }];
-
 export function AppSidebar() {
+	const [collapsed, setCollapsed] = useState(false);
 	const pathname = usePathname();
 	const { ready, authenticated, user, login } = usePrivy();
-
-	const handleProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-		if (!authenticated) {
-			e.preventDefault();
-			login();
-		}
-	};
 
 	const profileHref =
 		ready && authenticated && user?.wallet
 			? `/profile/${user.wallet.address}`
 			: "/";
 
+	const navLinks = [
+		{
+			href: "/",
+			label: "Home",
+			icon: HomeIcon,
+			iconFill: HomeFillIcon,
+		},
+		{
+			href: profileHref,
+			label: "Profile",
+			icon: PersonIcon,
+			iconFill: PersonFillIcon,
+		},
+	];
+
 	return (
-		<SidebarProvider>
-			<UISidebar className="h-full flex-col justify-between border-r bg-background p-0 md:flex w-60">
-				<SidebarHeader className="flex items-center h-16 px-6 border-b">
-					{/* Logo slot */}
-					<span className="font-bold text-xl tracking-tight">SoundCoin</span>
-					<SidebarTrigger className="ml-auto" />
-				</SidebarHeader>
-				<SidebarContent className="flex-1 flex flex-col justify-between">
-					<SidebarMenu className="flex flex-col space-y-2 px-4 pt-6">
-						{links.map((link) => (
-							<SidebarMenuItem key={link.href}>
-								<Link href={link.href} passHref legacyBehavior>
-									<SidebarMenuButton
-										asChild
-										isActive={pathname === link.href}
-										className={cn(
-											"flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors",
-											pathname === link.href
-												? "text-foreground bg-muted"
-												: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-										)}
-									>
-										<>
-											<link.icon className="h-5 w-5" />
-											<span>{link.label}</span>
-										</>
-									</SidebarMenuButton>
-								</Link>
-							</SidebarMenuItem>
-						))}
-						<SidebarMenuItem>
+		<div
+			className={cn(
+				"flex h-full flex-col py-1.5 transition-all duration-200 bg-background",
+				collapsed ? "w-16" : "w-60",
+			)}
+		>
+			{/* Logo and Toggle */}
+			<div className="flex h-16 items-center px-2 gap-2">
+				<Logo variant="sidebar" />
+				<button
+					type="button"
+					aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+					onClick={() => setCollapsed((c) => !c)}
+					className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
+				>
+					<svg
+						className={cn(
+							"h-5 w-5 transition-transform",
+							collapsed ? "rotate-180" : "",
+						)}
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M8 4l8 8-8 8"
+						/>
+					</svg>
+				</button>
+			</div>
+			{/* Navigation Links */}
+			<nav className="flex-1 px-2 pt-2">
+				<div className="w-full space-y-2">
+					{navLinks.map((link) => {
+						const isActive =
+							pathname === link.href ||
+							(link.href.startsWith("/profile") &&
+								pathname.startsWith("/profile"));
+						const IconComponent = isActive ? link.iconFill : link.icon;
+						return (
 							<Link
-								href={profileHref}
-								onClick={handleProfileClick}
-								passHref
-								legacyBehavior
+								key={link.href}
+								href={link.href}
+								className={cn(
+									"flex items-center gap-3 rounded-lg px-2 py-3 font-medium transition-colors",
+									isActive
+										? "text-foreground bg-muted"
+										: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+									collapsed && "justify-center px-0",
+								)}
+								onClick={
+									link.label === "Profile" && !authenticated
+										? (e) => {
+												e.preventDefault();
+												login();
+											}
+										: undefined
+								}
 							>
-								<SidebarMenuButton
-									asChild
-									isActive={pathname.startsWith("/profile")}
-									className={cn(
-										"flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors",
-										pathname.startsWith("/profile")
-											? "text-foreground bg-muted"
-											: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-									)}
-								>
-									<>
-										<User className="h-5 w-5" />
-										<span>Profile</span>
-									</>
-								</SidebarMenuButton>
+								<IconComponent className="h-5 w-5" />
+								{!collapsed && <span>{link.label}</span>}
 							</Link>
-						</SidebarMenuItem>
-					</SidebarMenu>
-					<div className="px-4 pb-4 mt-auto">
-						<ThemeToggle />
-					</div>
-				</SidebarContent>
-			</UISidebar>
-		</SidebarProvider>
+						);
+					})}
+				</div>
+			</nav>
+			{/* Bottom section: Theme Toggle */}
+			<div
+				className={cn(
+					"px-2 pb-4 mt-auto",
+					collapsed && "flex justify-center px-0",
+				)}
+			>
+				<ThemeToggle />
+			</div>
+		</div>
 	);
 }
