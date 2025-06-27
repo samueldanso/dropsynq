@@ -121,7 +121,7 @@ export const SearchBar = () => {
       <Input
         ref={inputRef}
         type="text"
-        placeholder="Search"
+        placeholder="Search songs and artists..."
         value={query}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
