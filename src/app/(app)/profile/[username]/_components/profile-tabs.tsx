@@ -1,31 +1,25 @@
+"use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ZoraProfile } from "@/types/profile";
 import { Collections } from "./collections";
-import { FollowingList } from "./following-list";
 import { TrackList } from "./track-list";
 
 interface ProfileTabsProps {
-	profile: ZoraProfile;
+	username: string;
 }
 
-export function ProfileTabs({ profile }: ProfileTabsProps) {
-	if (!profile.address) return null;
-
+export function ProfileTabs({ username }: ProfileTabsProps) {
 	return (
 		<Tabs defaultValue="tracks" className="w-full">
-			<TabsList>
-				<TabsTrigger value="tracks">Drops</TabsTrigger>
-				<TabsTrigger value="collections">Collections</TabsTrigger>
-				<TabsTrigger value="following">Following</TabsTrigger>
+			<TabsList className="mx-auto flex w-fit">
+				<TabsTrigger value="tracks">Creations</TabsTrigger>
+				<TabsTrigger value="collections">Collection</TabsTrigger>
 			</TabsList>
-			<TabsContent value="tracks">
-				<TrackList address={profile.address} />
+			<TabsContent value="tracks" className="mt-4">
+				<TrackList username={username} />
 			</TabsContent>
-			<TabsContent value="collections">
-				<Collections address={profile.address} />
-			</TabsContent>
-			<TabsContent value="following">
-				<FollowingList address={profile.address} />
+			<TabsContent value="collections" className="mt-4">
+				<Collections username={username} />
 			</TabsContent>
 		</Tabs>
 	);

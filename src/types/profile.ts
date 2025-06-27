@@ -1,13 +1,15 @@
 export interface ZoraProfile {
 	address: `0x${string}`;
 	handle?: string;
+	username?: string;
 	displayName?: string;
 	bio?: string;
 	avatar?: {
-		url?: string;
-		medium?: string;
+		small: string;
+		medium: string;
+		blurhash?: string;
 	};
 	publicWallet: {
-		address: `0x${string}`;
+		walletAddress: string;
 	};
 }

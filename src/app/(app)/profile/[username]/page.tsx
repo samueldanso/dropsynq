@@ -30,10 +30,16 @@ export default function ProfilePage() {
 		);
 	}
 
+	// At this point, we know we have a profile, so username should be defined
+	// If username is undefined, we'll use the profile's handle or address as fallback
+	const displayUsername = username || profile.handle || profile.address;
+
 	return (
-		<div className="flex h-full flex-col">
-			<ProfileHeader profile={profile} />
-			<ProfileTabs profile={profile} />
+		<div className="container mx-auto py-8">
+			<ProfileHeader username={displayUsername} />
+			<div className="mt-8">
+				<ProfileTabs username={displayUsername} />
+			</div>
 		</div>
 	);
 }

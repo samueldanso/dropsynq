@@ -1,14 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@zoralabs/coins-sdk";
+import { useApiQuery } from "@/hooks/use-api-query";
 import type { ZoraProfile } from "@/types/profile";
 
-export function useProfile(identifier: string) {
-	return useQuery<ZoraProfile | undefined>({
-		queryKey: ["profile", identifier],
-		queryFn: async () => {
-			const response = await getProfile({ identifier });
-			return response?.data?.profile as ZoraProfile | undefined;
+export function useProfile(username: string) {
+	return useApiQuery<ZoraProfile>(
+		["profile", username],
+		`/api/user/profile/${username}`,
+		{
+			enabled: !!username,
 		},
-		enabled: Boolean(identifier),
-	});
+	);
 }

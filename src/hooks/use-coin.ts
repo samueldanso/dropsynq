@@ -1,17 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCoin } from "@zoralabs/coins-sdk";
-import type { Address } from "viem";
+import { baseSepolia } from "viem/chains";
 
-export function useCoin(address: string, chainId?: number) {
+interface UseCoinArgs {
+	coinAddress?: string;
+}
+
+export function useCoin({ coinAddress }: UseCoinArgs) {
 	return useQuery({
-		queryKey: ["coin", address, chainId],
+		queryKey: ["coin", coinAddress],
 		queryFn: async () => {
+			if (!coinAddress) {
+				throw new Error("Coin address is required");
+			}
 			const response = await getCoin({
-				address: address as Address,
-				chain: chainId,
+				address: coinAddress,
+				chain: baseSepolia.id,
 			});
-			return response?.data?.zora20Token;
+			return response.data?.zora20Token;
 		},
-		enabled: Boolean(address),
+		enabled: !!coinAddress,
 	});
 }

@@ -18,7 +18,9 @@ function FollowingUser({ address }: { address: string }) {
 	}
 
 	return (
-		<Link href={`/profile/${profile.handle || profile.publicWallet.address}`}>
+		<Link
+			href={`/profile/${profile.handle || profile.publicWallet.walletAddress}`}
+		>
 			<div className="flex items-center gap-2 rounded-md p-2 hover:bg-muted">
 				<UserAvatar
 					src={profile.avatar?.medium}
@@ -28,7 +30,9 @@ function FollowingUser({ address }: { address: string }) {
 				<div>
 					<p className="font-semibold">{profile.displayName}</p>
 					<p className="text-muted-foreground text-sm">
-						@{profile.handle || formatAddress(profile.publicWallet.address)}
+						@
+						{profile.handle ||
+							formatAddress(profile.publicWallet.walletAddress)}
 					</p>
 				</div>
 			</div>

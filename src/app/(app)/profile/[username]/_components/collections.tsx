@@ -1,38 +1,43 @@
+"use client";
+
+import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfileBalances } from "@/hooks/use-profile-balances";
 import type { CoinBalance } from "@/types/coin";
 
 interface CollectionsProps {
-	address: string;
+	username: string;
 }
 
-export function Collections({ address }: CollectionsProps) {
-	const { data: balances, isLoading, isError } = useProfileBalances(address);
+export function Collections({ username }: CollectionsProps) {
+	const { data: balances, isLoading } = useProfileBalances(username);
 
-	if (isLoading) return <div className="p-4">Loading collections...</div>;
-	if (isError)
-		return (
-			<div className="p-4 text-destructive">Failed to load collections.</div>
-		);
-
-	// Show all coins that the user has balances for
 	const collections = balances?.filter(
 		(balance) => balance.coin && balance.amount.amountDecimal > 0,
 	);
 
-	if (!collections || collections.length === 0)
-		return <div className="p-4">No collections found.</div>;
+	if (isLoading) {
+		return (
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<TrackCardSkeleton />
+				<TrackCardSkeleton />
+				<TrackCardSkeleton />
+			</div>
+		);
+	}
+
+	if (!collections || collections.length === 0) {
+		return (
+			<div className="flex items-center justify-center p-8 text-center text-muted-foreground">
+				<p>This user's collection is empty.</p>
+			</div>
+		);
+	}
 
 	return (
-		<div className="space-y-2 p-4">
+		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 			{collections.map((balance: CoinBalance) => (
-				<div key={balance.id} className="rounded border p-2">
-					<div className="font-semibold">
-						{balance.coin?.name} ({balance.coin?.symbol})
-					</div>
-					<div className="text-muted-foreground text-sm">
-						Amount: {balance.amount.amountDecimal.toFixed(2)}
-					</div>
-				</div>
+				<TrackCard key={balance.id} coin={balance.coin!} />
 			))}
 		</div>
 	);
