@@ -3,11 +3,11 @@
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import HomeIcon from "public/icons/home.svg";
-import HomeFillIcon from "public/icons/homeFill.svg";
-import PersonIcon from "public/icons/person.svg";
-import PersonFillIcon from "public/icons/personFill.svg";
 import { useState } from "react";
+import HomeIcon from "@/components/icons/home.svg";
+import HomeFillIcon from "@/components/icons/homeFill.svg";
+import PersonIcon from "@/components/icons/person.svg";
+import PersonFillIcon from "@/components/icons/personFill.svg";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
