@@ -112,7 +112,7 @@ export function AppHeader() {
 		return (
 			<header className="flex h-14 w-full items-center justify-between bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 				{/* Left: Logo */}
-				<Logo variant="header" />
+				{/* <Logo variant="header" /> */}
 
 				{/* Right: Upload, Notifications, Profile */}
 				<div className="flex items-center gap-2">
@@ -152,7 +152,7 @@ export function AppHeader() {
 	return (
 		<header className="flex h-14 w-full items-center bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			{/* Left: Logo */}
-			<Logo variant="header" />
+			{/* <Logo variant="header" /> */}
 
 			{/* Center: Search Bar */}
 			<div className="mx-6 max-w-sm flex-1">

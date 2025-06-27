@@ -4,6 +4,8 @@ import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ChevronLeftIcon from "@/components/icons/chevron-left.svg";
+import ChevronRightIcon from "@/components/icons/chevronRight.svg";
 import HomeIcon from "@/components/icons/home.svg";
 import HomeFillIcon from "@/components/icons/homeFill.svg";
 import PersonIcon from "@/components/icons/person.svg";
@@ -28,12 +30,14 @@ export function AppSidebar() {
 			label: "Home",
 			icon: HomeIcon,
 			iconFill: HomeFillIcon,
+			isActive: () => pathname === "/",
 		},
 		{
 			href: profileHref,
 			label: "Profile",
 			icon: PersonIcon,
 			iconFill: PersonFillIcon,
+			isActive: () => pathname.startsWith("/profile"),
 		},
 	];
 
@@ -53,33 +57,18 @@ export function AppSidebar() {
 					onClick={() => setCollapsed((c) => !c)}
 					className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
 				>
-					<svg
-						className={cn(
-							"h-5 w-5 transition-transform",
-							collapsed ? "rotate-180" : "",
-						)}
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						aria-hidden="true"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M8 4l8 8-8 8"
-						/>
-					</svg>
+					{collapsed ? (
+						<ChevronRightIcon className="h-5 w-5" />
+					) : (
+						<ChevronLeftIcon className="h-5 w-5" />
+					)}
 				</button>
 			</div>
 			{/* Navigation Links */}
 			<nav className="flex-1 px-2 pt-2">
 				<div className="w-full space-y-2">
 					{navLinks.map((link) => {
-						const isActive =
-							pathname === link.href ||
-							(link.href.startsWith("/profile") &&
-								pathname.startsWith("/profile"));
+						const isActive = link.isActive();
 						const IconComponent = isActive ? link.iconFill : link.icon;
 						return (
 							<Link
