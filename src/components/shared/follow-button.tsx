@@ -2,7 +2,7 @@
 
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useFollow } from "@/hooks/use-follow";
+import { useFollowSocial } from "@/hooks/use-social";
 
 interface FollowButtonProps {
 	userId: string;
@@ -10,13 +10,13 @@ interface FollowButtonProps {
 
 export function FollowButton({ userId }: FollowButtonProps) {
 	const { address } = useAccount();
-	const followMutation = useFollow(userId);
+	const follow = useFollowSocial({ followeeAddress: userId });
 
 	const handleFollow = () => {
-		followMutation.mutate({});
+		follow.toggleFollow();
 	};
 
-	const isLoading = followMutation.isPending;
+	const isLoading = follow.isFollowLoading;
 
 	return (
 		<Button

@@ -1,8 +1,10 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { getCoin } from "@zoralabs/coins-sdk";
 import Image from "next/image";
+import { BuyCoinButton } from "@/components/shared/buy-coin-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCoin } from "@/hooks/use-coin";
 import { TradeCard } from "./trade-card";
 
 interface TrackDetailsProps {
@@ -10,7 +12,18 @@ interface TrackDetailsProps {
 }
 
 export default function TrackDetails({ id }: TrackDetailsProps) {
-	const { data: coin, isLoading, isError } = useCoin({ coinAddress: id });
+	const {
+		data: coin,
+		isLoading,
+		isError,
+	} = useQuery({
+		queryKey: ["coin", id],
+		queryFn: async () => {
+			const response = await getCoin({ address: id as `0x${string}` });
+			return response?.data?.zora20Token;
+		},
+		enabled: !!id,
+	});
 
 	if (isLoading) {
 		return (
@@ -56,6 +69,7 @@ export default function TrackDetails({ id }: TrackDetailsProps) {
 				<div className="text-base text-center mb-4">{coin.description}</div>
 				{audio && (
 					<audio controls src={audio} className="w-full">
+						<track kind="captions" />
 						Your browser does not support the audio element.
 					</audio>
 				)}
@@ -86,6 +100,9 @@ export default function TrackDetails({ id }: TrackDetailsProps) {
 					</div>
 				</div>
 				<TradeCard coinAddress={id} />
+				<div className="mt-4">
+					<BuyCoinButton coinAddress={id} />
+				</div>
 			</div>
 		</div>
 	);

@@ -1,4 +1,4 @@
-import type { ZoraCoin } from "./coin";
+import type { ZoraCoin } from "@/types/zora";
 
 // Music-specific track metadata (stored in IPFS)
 export interface TrackMetadata {

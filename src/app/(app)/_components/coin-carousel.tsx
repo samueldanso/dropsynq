@@ -1,15 +1,61 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import type { ExploreResponse, GetCoinResponse } from "@zoralabs/coins-sdk";
+import {
+	getCoinsMostValuable,
+	getCoinsNew,
+	getCoinsTopGainers,
+} from "@zoralabs/coins-sdk";
 import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
-import { useDiscoverCoins } from "@/hooks/use-discover-coins";
 
 interface CoinCarouselProps {
 	title: string;
-	type: "top-gainers" | "top-volume" | "most-valuable" | "newest";
+	type: "newest" | "trending" | "top-gainers";
 }
 
+type ZoraCoin = NonNullable<GetCoinResponse["zora20Token"]>;
+
 export function CoinCarousel({ title, type }: CoinCarouselProps) {
-	const { coins, isLoading, error } = useDiscoverCoins({ type });
+	const {
+		data: coins,
+		isLoading,
+		error,
+	} = useQuery<ZoraCoin[]>({
+		queryKey: ["discover-coins", type],
+		queryFn: async () => {
+			let response: ExploreResponse;
+
+			switch (type) {
+				case "newest":
+					response = await getCoinsNew();
+					break;
+				case "top-gainers":
+					response = await getCoinsTopGainers();
+					break;
+				case "trending":
+					response = await getCoinsMostValuable();
+					break;
+				default:
+					response = await getCoinsNew();
+			}
+
+			const coins =
+				response.data?.exploreList?.edges?.map(
+					(edge) =>
+						({
+							...edge.node,
+							zoraComments: {
+								pageInfo: { hasNextPage: false },
+								count: 0,
+								edges: [],
+							},
+						}) as ZoraCoin,
+				) || [];
+
+			return coins;
+		},
+	});
 
 	if (error) {
 		return (
@@ -32,11 +78,13 @@ export function CoinCarousel({ title, type }: CoinCarouselProps) {
 							<TrackCardSkeleton />
 						</>
 					)}
-					{coins?.map((coin) => (
-						<div key={coin.address} className="w-64 flex-shrink-0">
-							<TrackCard coin={coin} />
-						</div>
-					))}
+					{coins?.map((coin) =>
+						"zoraComments" in coin ? (
+							<div key={coin.address} className="w-64 flex-shrink-0">
+								<TrackCard coin={coin} />
+							</div>
+						) : null,
+					)}
 				</div>
 			</div>
 		</div>

@@ -1,30 +1,23 @@
 "use client";
 
-import { usePrivy } from "@privy-io/react-auth";
+import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { useSongSocial } from "@/hooks/use-social";
 
 interface LikeButtonProps {
 	trackId: string;
 }
 
 export function LikeButton({ trackId }: LikeButtonProps) {
-	const { ready, authenticated, login } = usePrivy();
+	const { address } = useAccount();
+	const { isLiked, isLikeLoading, toggleLike } = useSongSocial({
+		coinAddress: trackId,
+		userAddress: address,
+	});
 
-	// We can also show a loading skeleton here
-	if (!ready) {
-		return <Button disabled>Like</Button>;
-	}
-
-	const handleLike = () => {
-		if (!authenticated) {
-			login();
-			return;
-		}
-		// If authenticated, proceed with like logic
-		console.log(`Liking track ${trackId}`);
-		// Here you would typically call a mutation
-		// likeAction({ trackId });
-	};
-
-	return <Button onClick={handleLike}>Like</Button>;
+	return (
+		<Button onClick={toggleLike} disabled={!address || isLikeLoading}>
+			{isLikeLoading ? "..." : isLiked ? "Unlike" : "Like"}
+		</Button>
+	);
 }

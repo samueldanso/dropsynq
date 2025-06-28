@@ -1,16 +1,15 @@
 import { CoinCarousel } from "./_components/coin-carousel";
-import HeroSection from "./_components/hero-section";
+import HeroBanner from "./_components/hero-banner";
 
 export default function AppHomePage() {
 	return (
 		<div className="container mx-auto">
-			<HeroSection />
+			<HeroBanner />
 
 			<div className="my-12 space-y-12">
 				<CoinCarousel title="🚀 Newest Drops" type="newest" />
 				<CoinCarousel title="🔥 Top Gainers (24h)" type="top-gainers" />
-				<CoinCarousel title="💎 Most Valuable" type="most-valuable" />
-				<CoinCarousel title="📈 Top Volume (24h)" type="top-volume" />
+				<CoinCarousel title="💎 Most Valuable" type="trending" />
 			</div>
 		</div>
 	);

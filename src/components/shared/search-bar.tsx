@@ -1,13 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { getCoinsNew } from "@zoralabs/coins-sdk";
 import { Music, Search, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/hooks/use-debounce";
-import { useDiscoverCoins } from "@/hooks/use-discover-coins";
-import type { ZoraCoin } from "@/types/coin";
+import type { ZoraCoin } from "@/types/zora";
 
 export const SearchBar = () => {
 	const [query, setQuery] = useState("");
@@ -20,11 +20,26 @@ export const SearchBar = () => {
 	const router = useRouter();
 
 	// Debounce search query to avoid too many API calls
-	const debouncedQuery = useDebounce(query, 300);
+	const [debouncedQuery, setDebouncedQuery] = useState("");
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedQuery(query);
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [query]);
 
 	// Search for coins (tracks) - using newest type for search
-	const { coins = [], isLoading: isLoadingCoins } = useDiscoverCoins({
-		type: "newest",
+	const { data: coins = [], isLoading: isLoadingCoins } = useQuery({
+		queryKey: ["discover-coins", "newest"],
+		queryFn: async () => {
+			const response = await getCoinsNew();
+			// Extract coins from the response
+			const coins =
+				response?.data?.exploreList?.edges?.map((edge: any) => edge.node) || [];
+			return coins;
+		},
 	});
 
 	// Filter results based on active filter and search query
@@ -218,20 +233,29 @@ export const SearchBar = () => {
 											onClick={() => handleUserClick(user)}
 											className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-muted/50"
 										>
-											<div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+											<div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
 												<User className="h-4 w-4 text-muted-foreground" />
 											</div>
 											<div className="min-w-0 flex-1">
 												<div className="flex items-center gap-2">
 													<span className="truncate font-medium text-foreground">
-														{user.displayName || "Unknown Artist"}
+														{user.displayName ||
+															user.handle ||
+															"Unknown Artist"}
 													</span>
 												</div>
-												{user.handle && (
-													<span className="text-sm text-muted-foreground">
-														@{user.handle}
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
+													{user.handle && (
+														<>
+															<span>@{user.handle}</span>
+															<span>•</span>
+														</>
+													)}
+													<span>
+														{user.address?.slice(0, 6)}...
+														{user.address?.slice(-4)}
 													</span>
-												)}
+												</div>
 											</div>
 										</button>
 									))}

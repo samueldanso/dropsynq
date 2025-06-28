@@ -1,62 +1,87 @@
 "use client";
 
-import { Music, UserPlus, Users } from "lucide-react";
+import type { GetProfileBalancesResponse } from "@zoralabs/coins-sdk";
 import { useAccount } from "wagmi";
 import { FollowButton } from "@/components/shared/follow-button";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useProfile } from "@/hooks/use-profile";
-import { useProfileBalances } from "@/hooks/use-profile-balances";
-import { formatAddress } from "@/lib/utils";
-import type { ZoraProfile } from "@/types/profile";
-import { EditProfileDialog } from "./edit-profile-dialog";
+import type { ZoraProfile } from "@/types/zora";
+
+type CoinBalanceNode = NonNullable<
+	GetProfileBalancesResponse["profile"]
+>["coinBalances"]["edges"][0]["node"];
 
 interface ProfileHeaderProps {
-	username: string;
+	profile: ZoraProfile;
+	balances?: CoinBalanceNode[];
 }
 
-export function ProfileHeader({ username }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, balances }: ProfileHeaderProps) {
 	const { address: connectedAddress } = useAccount();
-	const { data: profile, isLoading: isLoadingProfile } = useProfile(username);
-	const { data: balances, isLoading: isLoadingBalances } = useProfileBalances(
-		profile?.address || "",
-	);
-
-	if (isLoadingProfile) return <ProfileHeaderSkeleton />;
 
 	if (!profile) return <div>User not found.</div>;
 
-	const isOwnProfile = connectedAddress === profile.address;
+	const isOwnProfile = connectedAddress === profile.publicWallet?.walletAddress;
 	const displayName = profile.displayName || "Anonymous";
 	const dropsCount = balances?.length || 0;
 	// TODO: Replace with actual data from off-chain DB once available.
 	const followingCount = 0;
 	const followersCount = 0;
 
+	// Copy to clipboard logic
+	function handleCopyAddress() {
+		if (profile?.publicWallet?.walletAddress) {
+			navigator.clipboard.writeText(profile.publicWallet.walletAddress);
+			if (typeof window !== "undefined") {
+				import("sonner").then(({ toast }) =>
+					toast.success("Wallet address copied!"),
+				);
+			}
+		}
+	}
+
 	return (
-		<div className="flex w-full flex-col items-center justify-center gap-6 border-b pb-8">
+		<div className="flex w-full flex-col items-center justify-center gap-6 pb-8">
 			{/* Profile Avatar */}
 			<UserAvatar src={profile.avatar?.medium} alt={displayName} size="xl" />
 
 			{/* Profile Info - Centered */}
 			<div className="flex flex-col items-center gap-2 text-center">
 				<h1 className="font-bold text-2xl">{displayName}</h1>
-				{profile.address && (
-					<p className="text-muted-foreground">
-						@{profile.handle || formatAddress(profile.address)}
-					</p>
+				{profile?.handle ? (
+					<div className="flex items-center gap-2">
+						<span className="text-muted-foreground">@{profile.handle}</span>
+						<span className="relative">
+							<button
+								type="button"
+								className="ml-1 px-2 py-0.5 rounded hover:bg-muted/60 text-xs text-muted-foreground border border-muted/30"
+								onClick={handleCopyAddress}
+								title="Copy wallet address"
+							>
+								{profile.publicWallet?.walletAddress.slice(0, 6)}...
+								{profile.publicWallet?.walletAddress.slice(-4)}
+							</button>
+						</span>
+					</div>
+				) : (
+					<span className="text-muted-foreground">
+						{profile?.publicWallet?.walletAddress &&
+							`${profile.publicWallet.walletAddress.slice(
+								0,
+								6,
+							)}...${profile.publicWallet.walletAddress.slice(-4)}`}
+					</span>
 				)}
-				{profile.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
+				{profile?.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
 			</div>
 
-			{/* Stats - Centered with icons */}
+			{/* Stats - Centered */}
 			<div className="flex items-center gap-8 font-medium text-muted-foreground">
 				<div className="flex flex-col items-center">
 					<span className="font-semibold text-foreground text-xl">
-						{isLoadingBalances ? "..." : dropsCount}
+						{dropsCount}
 					</span>
 					<div className="flex items-center gap-1 text-sm">
-						<Music className="size-3" />
 						<span>Drops</span>
 					</div>
 				</div>
@@ -65,7 +90,6 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
 						{followingCount}
 					</span>
 					<div className="flex items-center gap-1 text-sm">
-						<UserPlus className="size-3" />
 						<span>Following</span>
 					</div>
 				</div>
@@ -74,7 +98,6 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
 						{followersCount}
 					</span>
 					<div className="flex items-center gap-1 text-sm">
-						<Users className="size-3" />
 						<span>Followers</span>
 					</div>
 				</div>
@@ -83,9 +106,26 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
 			{/* Action Button - Centered */}
 			<div className="flex w-full justify-center">
 				{isOwnProfile ? (
-					<EditProfileDialog profile={profile} />
+					<a
+						href={`https://testnet.zora.co/${
+							profile.handle
+								? `@${profile.handle}`
+								: profile.publicWallet?.walletAddress
+						}`}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<button
+							type="button"
+							className="rounded-full px-8 py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+						>
+							Edit on Zora
+						</button>
+					</a>
 				) : (
-					profile.address && <FollowButton userId={profile.address} />
+					profile.publicWallet?.walletAddress && (
+						<FollowButton userId={profile.publicWallet.walletAddress} />
+					)
 				)}
 			</div>
 		</div>

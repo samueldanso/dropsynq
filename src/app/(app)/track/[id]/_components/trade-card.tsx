@@ -1,19 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	type ConnectedWallet,
-	usePrivy,
-	useWallets,
-} from "@privy-io/react-auth";
-import { tradeCoinCall } from "@zoralabs/coins-sdk";
+import { useWallets } from "@privy-io/react-auth";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parseEther } from "viem";
-import { useConfig, useWriteContract } from "wagmi";
+import { useBalance, useConfig, useWriteContract } from "wagmi";
 import { simulateContract } from "wagmi/actions";
 import { z } from "zod";
-
+import { BuyCoinButton } from "@/components/shared/buy-coin-button";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -25,7 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useCoinBalance } from "@/hooks/use-coin-balance";
 
 const tradeFormSchema = z.object({
 	amount: z.string().min(1, "An amount is required"),
@@ -38,7 +32,6 @@ interface TradeCardProps {
 }
 
 export function TradeCard({ coinAddress }: TradeCardProps) {
-	const { user } = usePrivy();
 	const { wallets } = useWallets();
 	const config = useConfig();
 
@@ -46,14 +39,15 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
 		(wallet) => wallet.walletClientType === "privy",
 	);
 
-	const {
-		balance,
-		symbol,
-		isLoading: isBalanceLoading,
-	} = useCoinBalance({
-		coinAddress: coinAddress as `0x${string}`,
-		userAddress: embeddedWallet?.address as `0x${string}`,
-	});
+	const shouldFetchBalance = !!embeddedWallet?.address && !!coinAddress;
+	const { data: balanceData, isLoading: isBalanceLoading } = useBalance(
+		shouldFetchBalance
+			? {
+					address: embeddedWallet.address as `0x${string}`,
+					token: coinAddress as `0x${string}`,
+				}
+			: { address: undefined, token: undefined },
+	);
 
 	const form = useForm<TradeFormValues>({
 		resolver: zodResolver(tradeFormSchema),
@@ -71,6 +65,9 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
 			return;
 		}
 
+		toast.info("Trading is temporarily disabled due to SDK issue.");
+		return;
+		/*
 		try {
 			const tradeParams = {
 				direction,
@@ -98,12 +95,16 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
 				error instanceof Error ? error.message : "Trade execution failed",
 			);
 		}
+		*/
 	};
 
 	return (
 		<div className="p-4 border rounded-lg bg-background w-full">
 			<div className="mb-4 text-sm text-muted-foreground">
-				Your Balance: {isBalanceLoading ? "..." : `${balance} ${symbol || ""}`}
+				Your Balance:{" "}
+				{isBalanceLoading
+					? "..."
+					: `${balanceData?.formatted || "0"} ${balanceData?.symbol || ""}`}
 			</div>
 			<Tabs defaultValue="buy" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
@@ -170,6 +171,9 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
 					</TabsContent>
 				</Form>
 			</Tabs>
+			<div className="mt-4">
+				<BuyCoinButton coinAddress={coinAddress} />
+			</div>
 		</div>
 	);
 }

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { base, baseSepolia, zora, zoraSepolia } from "viem/chains";
 import { http } from "wagmi";
 import { env } from "@/env";
+import "@/lib/zora";
 
 const config = createConfig({
 	chains: [base, baseSepolia, zora, zoraSepolia],

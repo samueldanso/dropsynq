@@ -1,18 +1,14 @@
 "use client";
 
-// This component will be a list of tracks specifically for the profile page.
-
 import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
-import { useProfileTracks } from "@/hooks/use-profile-tracks";
+import type { ZoraCoin } from "@/types/zora";
 
 interface TrackListProps {
-	username: string;
+	coins?: ZoraCoin[];
 }
 
-export function TrackList({ username }: TrackListProps) {
-	const { data: coins, isLoading } = useProfileTracks(username);
-
-	if (isLoading) {
+export function TrackList({ coins }: TrackListProps) {
+	if (!coins) {
 		return (
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<TrackCardSkeleton />
@@ -22,10 +18,10 @@ export function TrackList({ username }: TrackListProps) {
 		);
 	}
 
-	if (!coins || coins.length === 0) {
+	if (coins.length === 0) {
 		return (
 			<div className="flex items-center justify-center p-8 text-center text-muted-foreground">
-				<p>This user hasn't created any tracks yet.</p>
+				<p>This user hasn&apos;t created any song yet.</p>
 			</div>
 		);
 	}

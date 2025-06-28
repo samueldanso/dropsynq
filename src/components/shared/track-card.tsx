@@ -1,6 +1,9 @@
 // This component will be used to display a single track in a feed or list.
+"use client";
 
+import type { GetCoinResponse } from "@zoralabs/coins-sdk";
 import { Play, TrendingUp, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +15,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { ZoraCoin } from "@/types/coin";
+
+type ZoraCoin = NonNullable<GetCoinResponse["zora20Token"]>;
 
 interface TrackCardProps {
 	coin: ZoraCoin;
@@ -23,9 +27,11 @@ export function TrackCard({ coin }: TrackCardProps) {
 		<Card className="overflow-hidden transition-shadow hover:shadow-lg">
 			<div className="relative aspect-square bg-gradient-to-br from-purple-500 to-pink-500">
 				{coin.mediaContent?.previewImage?.medium ? (
-					<img
-						src={coin.mediaContent.previewImage.medium}
+					<Image
+						src={coin.mediaContent.previewImage.medium || "/default-track.png"}
 						alt={coin.name}
+						width={400}
+						height={400}
 						className="h-full w-full object-cover"
 					/>
 				) : (
@@ -64,9 +70,11 @@ export function TrackCard({ coin }: TrackCardProps) {
 
 				<div className="mb-4 flex items-center gap-2">
 					{coin.creatorProfile?.avatar?.previewImage?.medium && (
-						<img
+						<Image
 							src={coin.creatorProfile.avatar.previewImage.medium}
-							alt={coin.creatorProfile.handle}
+							alt={coin.creatorProfile.handle || "creator avatar"}
+							width={24}
+							height={24}
 							className="size-6 rounded-full"
 						/>
 					)}

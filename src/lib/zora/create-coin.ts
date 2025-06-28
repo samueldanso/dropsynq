@@ -1,5 +1,6 @@
 "server only";
 
+import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
 import { createCoin, DeployCurrency } from "@zoralabs/coins-sdk";
 import {
 	type Address,
@@ -14,7 +15,7 @@ import { env } from "@/env";
 export interface CreateSongCoinParams {
 	name: string;
 	symbol: string;
-	uri: string; // IPFS metadata URI
+	uri: ValidMetadataURI; // IPFS metadata URI
 	payoutRecipient: Address;
 	platformReferrer?: Address;
 }
