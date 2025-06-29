@@ -1,3 +1,4 @@
+import "server-only";
 import { setApiKey } from "@zoralabs/coins-sdk";
 
 import { env } from "@/env";
