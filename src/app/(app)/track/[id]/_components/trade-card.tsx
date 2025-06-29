@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { tradeCoinCall } from "@zoralabs/coins-sdk";
+
+// import { tradeCoinCall } from "@zoralabs/coins-sdk"; // Temporarily disabled due to SDK issue
 
 const tradeFormSchema = z.object({
   amount: z.string().min(1, "An amount is required"),
@@ -61,42 +62,46 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
     values: TradeFormValues,
     direction: "buy" | "sell"
   ) => {
+    // Temporarily disabled due to Zora SDK tradeCoinCall issue
+    toast.info(
+      "Trading is temporarily disabled. Zora team is working on a fix."
+    );
+    return;
+
+    /*
     if (!embeddedWallet?.address) {
       toast.error("No connected wallet found.");
       return;
     }
 
-    toast.info("Trading is temporarily disabled due to SDK issue.");
-    return;
-    /*
-		try {
-			const tradeParams = {
-				direction,
-				target: coinAddress as `0x${string}`,
-				args: {
-					recipient: embeddedWallet.address as `0x${string}`,
-					orderSize: parseEther(values.amount),
-				},
-			};
+    try {
+      const tradeParams = {
+        direction,
+        target: coinAddress as `0x${string}`,
+        args: {
+          recipient: embeddedWallet.address as `0x${string}`,
+          orderSize: parseEther(values.amount),
+        },
+      };
 
-			const contractCallParams = tradeCoinCall(tradeParams);
+      const contractCallParams = tradeCoinCall(tradeParams);
 
-			const { request } = await simulateContract(config, {
-				...contractCallParams,
-				value: direction === "buy" ? parseEther(values.amount) : BigInt(0),
-				account: embeddedWallet.address as `0x${string}`,
-			});
+      const { request } = await simulateContract(config, {
+        ...contractCallParams,
+        value: direction === "buy" ? parseEther(values.amount) : BigInt(0),
+        account: embeddedWallet.address as `0x${string}`,
+      });
 
-			await writeContractAsync(request);
+      await writeContractAsync(request);
 
-			toast.success(`Successfully executed ${direction} order!`);
-		} catch (error) {
-			console.error("Trade failed:", error);
-			toast.error(
-				error instanceof Error ? error.message : "Trade execution failed",
-			);
-		}
-		*/
+      toast.success(`Successfully executed ${direction} order!`);
+    } catch (error) {
+      console.error("Trade failed:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Trade execution failed",
+      );
+    }
+    */
   };
 
   return (

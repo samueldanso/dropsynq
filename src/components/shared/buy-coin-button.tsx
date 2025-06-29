@@ -7,7 +7,8 @@ import { parseEther } from "viem";
 import { useConfig, useWriteContract } from "wagmi";
 import { simulateContract } from "wagmi/actions";
 import { Button } from "@/components/ui/button";
-import { tradeCoinCall } from "@zoralabs/coins-sdk";
+
+// import { tradeCoinCall } from "@zoralabs/coins-sdk"; // Temporarily disabled due to SDK issue
 
 interface BuyCoinButtonProps {
   coinAddress: string;
@@ -28,6 +29,13 @@ export function BuyCoinButton({
   );
 
   const handleBuy = async () => {
+    // Temporarily disabled due to Zora SDK tradeCoinCall issue
+    toast.info(
+      "Buy functionality is temporarily disabled. Zora team is working on a fix."
+    );
+    return;
+
+    /*
     if (!embeddedWallet?.address) {
       toast.error("No connected wallet found.");
       return;
@@ -62,6 +70,7 @@ export function BuyCoinButton({
     } finally {
       setIsLoading(false);
     }
+    */
   };
 
   return (
