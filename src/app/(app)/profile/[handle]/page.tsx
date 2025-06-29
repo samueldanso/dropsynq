@@ -83,15 +83,17 @@ export default function ProfilePage() {
 		handle || profile.data.handle || profile.data.publicWallet?.walletAddress;
 
 	return (
-		<div className="container mx-auto py-8">
-			<ProfileHeader profile={profile.data} balances={balances.data} />
-			<div className="mt-8">
-				<ProfileTabs
-					handle={displayHandle}
-					profile={profile.data}
-					balances={balances.data}
-					coins={coins.data}
-				/>
+		<div className="mx-auto max-w-7xl px-4 py-8">
+			<div className="rounded-2xl bg-muted/80 shadow-lg p-8 mt-6 mb-6">
+				<ProfileHeader profile={profile.data} balances={balances.data} />
+				<div className="mt-8">
+					<ProfileTabs
+						handle={displayHandle}
+						profile={profile.data}
+						balances={balances.data}
+						coins={coins.data}
+					/>
+				</div>
 			</div>
 		</div>
 	);

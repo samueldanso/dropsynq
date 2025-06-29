@@ -30,10 +30,10 @@ function UploadButton() {
 		<Link href="/create">
 			<Button
 				variant="default"
-				size="sm"
-				className="flex items-center gap-2 bg-primary font-medium text-primary-foreground hover:bg-primary/90 rounded-full"
+				size="lg"
+				className="flex items-center gap-2 h-11 px-6 text-base bg-primary font-medium text-primary-foreground hover:bg-primary/90 rounded-full"
 			>
-				<Plus className="h-4 w-4" />
+				<Plus className="h-5 w-5" />
 				<span className="hidden sm:inline">Upload</span>
 			</Button>
 		</Link>
@@ -81,7 +81,7 @@ function ProfileDropdown() {
 		return (
 			<Button
 				onClick={login}
-				className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
+				className="h-11 px-6 text-base bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
 				variant="default"
 			>
 				Log in
@@ -136,9 +136,9 @@ export function AppHeader() {
 
 	if (isMobile) {
 		return (
-			<header className="flex h-14 w-full items-center justify-between bg-background px-4">
+			<header className="flex h-16 w-full items-center justify-between bg-background px-6">
 				{/* Right: Upload, Notifications, Profile */}
-				<div className="flex items-center gap-2 ml-auto">
+				<div className="flex items-center gap-3 ml-auto">
 					<UploadButton />
 					<NotificationsButton />
 					<ProfileDropdown />
@@ -173,13 +173,13 @@ export function AppHeader() {
 	}
 
 	return (
-		<header className="flex h-14 w-full items-center bg-background px-6">
+		<header className="flex h-16 w-full items-center bg-background px-8">
 			{/* Center: Search Bar */}
-			<div className="mx-auto max-w-xs flex-1">
+			<div className="mx-auto max-w-md flex-1">
 				<SearchBar />
 			</div>
 			{/* Right: Upload, Notifications & Profile Avatar */}
-			<div className="flex items-center gap-3 ml-auto">
+			<div className="flex items-center gap-5 ml-8">
 				<UploadButton />
 				<NotificationsButton />
 				<ProfileDropdown />

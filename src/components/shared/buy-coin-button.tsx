@@ -11,31 +11,31 @@ import { Button } from "@/components/ui/button";
 // import { tradeCoinCall } from "@zoralabs/coins-sdk"; // Temporarily disabled due to SDK issue
 
 interface BuyCoinButtonProps {
-  coinAddress: string;
-  amount?: string; // Optional, default to "1"
+	coinAddress: string;
+	amount?: string; // Optional, default to "1"
 }
 
 export function BuyCoinButton({
-  coinAddress,
-  amount = "1",
+	coinAddress,
+	amount = "1",
 }: BuyCoinButtonProps) {
-  const { wallets } = useWallets();
-  const config = useConfig();
-  const { writeContractAsync, isPending } = useWriteContract();
-  const [isLoading, setIsLoading] = useState(false);
+	const { wallets } = useWallets();
+	const config = useConfig();
+	const { writeContractAsync, isPending } = useWriteContract();
+	const [isLoading, setIsLoading] = useState(false);
 
-  const embeddedWallet = wallets.find(
-    (wallet) => wallet.walletClientType === "privy"
-  );
+	const embeddedWallet = wallets.find(
+		(wallet) => wallet.walletClientType === "privy",
+	);
 
-  const handleBuy = async () => {
-    // Temporarily disabled due to Zora SDK tradeCoinCall issue
-    toast.info(
-      "Buy functionality is temporarily disabled. Zora team is working on a fix."
-    );
-    return;
+	const handleBuy = async () => {
+		// Temporarily disabled due to Zora SDK tradeCoinCall issue
+		toast.info(
+			"Buy functionality is temporarily disabled. Zora team is working on a fix.",
+		);
+		return;
 
-    /*
+		/*
     if (!embeddedWallet?.address) {
       toast.error("No connected wallet found.");
       return;
@@ -71,18 +71,18 @@ export function BuyCoinButton({
       setIsLoading(false);
     }
     */
-  };
+	};
 
-  return (
-    <Button
-      onClick={handleBuy}
-      disabled
-      className="w-full"
-      title="Buy is temporarily disabled due to SDK issue."
-    >
-      Buy (Temporarily Disabled)
-    </Button>
-  );
+	return (
+		<Button
+			onClick={handleBuy}
+			disabled
+			className="w-full"
+			title="Buy is temporarily disabled due to SDK issue."
+		>
+			Buy (Temporarily Disabled)
+		</Button>
+	);
 }
 
 export default BuyCoinButton;
