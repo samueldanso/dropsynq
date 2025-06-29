@@ -7,36 +7,33 @@ import { parseEther } from "viem";
 import { useConfig, useWriteContract } from "wagmi";
 import { simulateContract } from "wagmi/actions";
 import { Button } from "@/components/ui/button";
+import { tradeCoinCall } from "@zoralabs/coins-sdk";
 
 interface BuyCoinButtonProps {
-	coinAddress: string;
-	amount?: string; // Optional, default to "1"
+  coinAddress: string;
+  amount?: string; // Optional, default to "1"
 }
 
 export function BuyCoinButton({
-	coinAddress,
-	amount = "1",
+  coinAddress,
+  amount = "1",
 }: BuyCoinButtonProps) {
-	const { wallets } = useWallets();
-	const config = useConfig();
-	const { writeContractAsync, isPending } = useWriteContract();
-	const [isLoading, setIsLoading] = useState(false);
+  const { wallets } = useWallets();
+  const config = useConfig();
+  const { writeContractAsync, isPending } = useWriteContract();
+  const [isLoading, setIsLoading] = useState(false);
 
-	const embeddedWallet = wallets.find(
-		(wallet) => wallet.walletClientType === "privy",
-	);
+  const embeddedWallet = wallets.find(
+    (wallet) => wallet.walletClientType === "privy"
+  );
 
-	const handleBuy = async () => {
-		toast.info("Buy functionality is temporarily disabled due to SDK issue.");
-		return;
-		/*
+  const handleBuy = async () => {
     if (!embeddedWallet?.address) {
       toast.error("No connected wallet found.");
       return;
     }
     setIsLoading(true);
     try {
-      // You must have a tradeCoinCall utility or SDK function
       const tradeParams = {
         direction: "buy",
         target: coinAddress as `0x${string}`,
@@ -46,18 +43,17 @@ export function BuyCoinButton({
         },
       };
 
-      // SDK or utility function missing: tradeCoinCall
-      // const contractCallParams = await tradeCoinCall(tradeParams);
+      const contractCallParams = tradeCoinCall(tradeParams);
 
-      // const { request } = await simulateContract(config, {
-      //   ...contractCallParams,
-      //   value: parseEther(amount),
-      //   account: embeddedWallet.address as `0x${string}`,
-      // });
+      const { request } = await simulateContract(config, {
+        ...contractCallParams,
+        value: parseEther(amount),
+        account: embeddedWallet.address as `0x${string}`,
+      });
 
-      // await writeContractAsync(request);
+      await writeContractAsync(request);
 
-      // toast.success("Successfully bought coin!");
+      toast.success("Successfully bought coin!");
     } catch (error) {
       console.error("Buy failed:", error);
       toast.error(
@@ -66,19 +62,18 @@ export function BuyCoinButton({
     } finally {
       setIsLoading(false);
     }
-    */
-	};
+  };
 
-	return (
-		<Button
-			onClick={handleBuy}
-			disabled
-			className="w-full"
-			title="Buy is temporarily disabled due to SDK issue."
-		>
-			Buy (Temporarily Disabled)
-		</Button>
-	);
+  return (
+    <Button
+      onClick={handleBuy}
+      disabled
+      className="w-full"
+      title="Buy is temporarily disabled due to SDK issue."
+    >
+      Buy (Temporarily Disabled)
+    </Button>
+  );
 }
 
 export default BuyCoinButton;
