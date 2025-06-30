@@ -110,15 +110,10 @@ export function AppSidebar() {
             );
           })}
         </nav>
-        {/* Bottom: Profile/Settings (icon only) */}
+        {/* Bottom: Profile/Settings (optional, can add here) */}
         <div className="mb-4 flex flex-col items-center gap-2">
-          <Link
-            href="/profile/settings"
-            className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
-            title="Settings"
-          >
-            <Settings className="h-5 w-5" />
-          </Link>
+          {/* Example: Profile icon or settings */}
+          {/* Add your profile/settings/logout here if needed */}
         </div>
       </div>
     );
@@ -183,15 +178,10 @@ export function AppSidebar() {
           );
         })}
       </nav>
-      {/* Bottom: Profile/Settings (icon + label) */}
+      {/* Bottom: Profile/Settings (optional, can add here) */}
       <div className="mb-4 flex flex-col items-center gap-2">
-        <Link
-          href="/profile/settings"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
-        >
-          <Settings className="h-5 w-5" />
-          <span>Settings</span>
-        </Link>
+        {/* Example: Profile icon or settings */}
+        {/* Add your profile/settings/logout here if needed */}
       </div>
     </div>
   );
