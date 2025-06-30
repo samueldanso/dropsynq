@@ -99,6 +99,22 @@ function ProfileDropdown() {
     }
   }
 
+  // Compute full profile link for sharing
+  const profileLink =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${
+          zoraProfile?.handle
+            ? `/profile/@${zoraProfile.handle}`
+            : user?.wallet?.address
+            ? `/profile/${user.wallet.address}`
+            : ""
+        }`
+      : zoraProfile?.handle
+      ? `/profile/@${zoraProfile.handle}`
+      : user?.wallet?.address
+      ? `/profile/${user.wallet.address}`
+      : "";
+
   if (!authenticated || !user) {
     return (
       <Button
@@ -166,8 +182,8 @@ function ProfileDropdown() {
               <button
                 type="button"
                 className="p-1 hover:bg-muted/60 rounded"
-                onClick={() => handleCopy(handleToCopy!)}
-                title="Copy handle"
+                onClick={() => handleCopy(profileLink)}
+                title="Copy profile link"
               >
                 <Copy className="h-3 w-3" />
               </button>

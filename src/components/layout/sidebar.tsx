@@ -12,15 +12,30 @@ import PersonFillIcon from "@/components/icons/personFill.svg";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "@zoralabs/coins-sdk";
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const { ready, authenticated, user, login } = usePrivy();
 
+  // Fetch Zora profile for handle (if authenticated)
+  const { data: zoraProfile } = useQuery({
+    queryKey: ["zora-profile", user?.wallet?.address],
+    queryFn: async () => {
+      if (!user?.wallet?.address) return null;
+      const res = await getProfile({ identifier: user.wallet.address });
+      return res?.data?.profile;
+    },
+    enabled: !!user?.wallet?.address,
+  });
+
   const profileHref =
     ready && authenticated && user?.wallet
-      ? `/profile/${user.wallet.address}`
+      ? zoraProfile?.handle
+        ? `/profile/@${zoraProfile.handle}`
+        : `/profile/${user.wallet.address}`
       : "/";
 
   const navLinks = [
@@ -160,8 +175,8 @@ export function AppSidebar() {
                 isProtected && !authenticated
                   ? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                   : isActive
-                  ? "text-foreground bg-muted"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  ? "text-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
               onClick={
                 isProtected && !authenticated
