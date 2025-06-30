@@ -65,7 +65,7 @@ export function AppSidebar() {
 						type="button"
 						aria-label="Expand sidebar"
 						onClick={() => setCollapsed(false)}
-						className="flex justify-center items-center rounded-lg px-0 py-3 w-full hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring mb-2"
+						className="flex justify-center items-center w-10 h-10 rounded-full hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring mb-2 transition-colors"
 					>
 						<PanelLeftOpen className="h-5 w-5" />
 					</button>
@@ -82,14 +82,7 @@ export function AppSidebar() {
 							<Link
 								key={link.href}
 								href={link.href}
-								className={cn(
-									"flex items-center justify-center rounded-lg px-0 py-3 font-medium transition-colors",
-									isProtected && !authenticated
-										? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-										: isActive
-											? "text-foreground bg-muted"
-											: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-								)}
+								className="flex items-center justify-center"
 								onClick={
 									isProtected && !authenticated
 										? (e) => {
@@ -99,7 +92,18 @@ export function AppSidebar() {
 										: undefined
 								}
 							>
-								<IconComponent className="h-5 w-5" />
+								<span
+									className={cn(
+										"flex items-center justify-center w-10 h-10 rounded-full transition-colors",
+										isProtected && !authenticated
+											? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+											: isActive
+												? "bg-muted text-foreground"
+												: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+									)}
+								>
+									<IconComponent className="h-5 w-5" />
+								</span>
 							</Link>
 						);
 					})}
