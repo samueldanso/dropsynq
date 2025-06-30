@@ -34,7 +34,7 @@ export function AppSidebar() {
   const profileHref =
     ready && authenticated && user?.wallet
       ? zoraProfile?.handle
-        ? `/profile/@${zoraProfile.handle}`
+        ? `/profile/${zoraProfile.handle}`
         : `/profile/${user.wallet.address}`
       : "/";
 

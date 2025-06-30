@@ -104,13 +104,13 @@ function ProfileDropdown() {
     typeof window !== "undefined"
       ? `${window.location.origin}${
           zoraProfile?.handle
-            ? `/profile/@${zoraProfile.handle}`
+            ? `/profile/${zoraProfile.handle}`
             : user?.wallet?.address
             ? `/profile/${user.wallet.address}`
             : ""
         }`
       : zoraProfile?.handle
-      ? `/profile/@${zoraProfile.handle}`
+      ? `/profile/${zoraProfile.handle}`
       : user?.wallet?.address
       ? `/profile/${user.wallet.address}`
       : "";
@@ -141,7 +141,7 @@ function ProfileDropdown() {
   const handleProfileClick = () => {
     if (user.wallet) {
       if (handle) {
-        router.push(`/profile/@${handle}`);
+        router.push(`/profile/${handle}`);
       } else {
         router.push(`/profile/${user.wallet.address}`);
       }
