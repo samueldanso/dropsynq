@@ -137,7 +137,7 @@ export default function CreateForm() {
 						name="name"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Song Title</FormLabel>
+								<FormLabel>Title</FormLabel>
 								<FormControl>
 									<Input placeholder="Enter song title" {...field} />
 								</FormControl>

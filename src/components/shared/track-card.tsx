@@ -28,7 +28,7 @@ export function TrackCard({ coin }: TrackCardProps) {
 			<div className="relative aspect-square bg-gradient-to-br from-purple-500 to-pink-500">
 				{coin.mediaContent?.previewImage?.medium ? (
 					<Image
-						src={coin.mediaContent.previewImage.medium || "/default-track.png"}
+						src={coin.mediaContent.previewImage.medium}
 						alt={coin.name}
 						width={400}
 						height={400}

@@ -12,11 +12,11 @@ export function Logo({ className = "", variant = "header" }: LogoProps) {
 		<Link
 			href="/"
 			className={`flex items-center gap-2 ${className}`}
-			aria-label="SynqDrop Home"
+			aria-label="DropSynq Home"
 		>
 			<Image
 				src="/icon.svg"
-				alt="SynqDrop Logo"
+				alt="DropSynq Logo"
 				width={size}
 				height={size}
 				priority
@@ -26,7 +26,7 @@ export function Logo({ className = "", variant = "header" }: LogoProps) {
 					variant === "sidebar" ? "text-lg" : "text-xl"
 				}`}
 			>
-				SynqDrop
+				DropSynq
 			</span>
 		</Link>
 	);

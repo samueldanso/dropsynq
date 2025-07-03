@@ -54,7 +54,7 @@ export async function createSongCoin(params: CreateSongCoinParams) {
 				params.platformReferrer ||
 				("0x0000000000000000000000000000000000000000" as Address),
 			chainId: baseSepolia.id,
-			currency: DeployCurrency.ETH, // Use ETH on Base Sepolia testnet
+			currency: DeployCurrency.ETH, // Use ETH on Base and Base Sepolia testnet
 		};
 
 		// 5. Call the SDK function

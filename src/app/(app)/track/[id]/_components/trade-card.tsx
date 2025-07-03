@@ -11,12 +11,12 @@ import { z } from "zod";
 import { BuyCoinButton } from "@/components/shared/buy-coin-button";
 import { Button } from "@/components/ui/button";
 import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,51 +24,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { tradeCoinCall } from "@zoralabs/coins-sdk"; // Temporarily disabled due to SDK issue
 
 const tradeFormSchema = z.object({
-	amount: z.string().min(1, "An amount is required"),
+  amount: z.string().min(1, "An amount is required"),
 });
 
 type TradeFormValues = z.infer<typeof tradeFormSchema>;
 
 interface TradeCardProps {
-	coinAddress: string;
+  coinAddress: string;
 }
 
 export function TradeCard({ coinAddress }: TradeCardProps) {
-	const { wallets } = useWallets();
-	const config = useConfig();
+  const { wallets } = useWallets();
+  const config = useConfig();
 
-	const embeddedWallet = wallets.find(
-		(wallet) => wallet.walletClientType === "privy",
-	);
+  const embeddedWallet = wallets.find(
+    (wallet) => wallet.walletClientType === "privy"
+  );
 
-	const shouldFetchBalance = !!embeddedWallet?.address && !!coinAddress;
-	const { data: balanceData, isLoading: isBalanceLoading } = useBalance(
-		shouldFetchBalance
-			? {
-					address: embeddedWallet.address as `0x${string}`,
-					token: coinAddress as `0x${string}`,
-				}
-			: { address: undefined, token: undefined },
-	);
+  const shouldFetchBalance = !!embeddedWallet?.address && !!coinAddress;
+  const { data: balanceData, isLoading: isBalanceLoading } = useBalance(
+    shouldFetchBalance
+      ? {
+          address: embeddedWallet.address as `0x${string}`,
+          token: coinAddress as `0x${string}`,
+        }
+      : { address: undefined, token: undefined }
+  );
 
-	const form = useForm<TradeFormValues>({
-		resolver: zodResolver(tradeFormSchema),
-		defaultValues: { amount: "0" },
-	});
+  const form = useForm<TradeFormValues>({
+    resolver: zodResolver(tradeFormSchema),
+    defaultValues: { amount: "0" },
+  });
 
-	const { writeContractAsync, isPending } = useWriteContract();
+  const { writeContractAsync, isPending } = useWriteContract();
 
-	const onSubmit = async (
-		values: TradeFormValues,
-		direction: "buy" | "sell",
-	) => {
-		// Temporarily disabled due to Zora SDK tradeCoinCall issue
-		toast.info(
-			"Trading is temporarily disabled. Zora team is working on a fix.",
-		);
-		return;
+  const onSubmit = async (
+    values: TradeFormValues,
+    direction: "buy" | "sell"
+  ) => {
+    // Temporarily disabled due to Zora SDK tradeCoinCall issue
+    toast.info(
+      "Trading is temporarily disabled. Zora team is working on a fix."
+    );
+    return;
 
-		/*
+    /*
     if (!embeddedWallet?.address) {
       toast.error("No connected wallet found.");
       return;
@@ -102,84 +102,84 @@ export function TradeCard({ coinAddress }: TradeCardProps) {
       );
     }
     */
-	};
+  };
 
-	return (
-		<div className="p-4 border rounded-lg bg-background w-full">
-			<div className="mb-4 text-sm text-muted-foreground">
-				Your Balance:{" "}
-				{isBalanceLoading
-					? "..."
-					: `${balanceData?.formatted || "0"} ${balanceData?.symbol || ""}`}
-			</div>
-			<Tabs defaultValue="buy" className="w-full">
-				<TabsList className="grid w-full grid-cols-2">
-					<TabsTrigger value="buy">Buy</TabsTrigger>
-					<TabsTrigger value="sell">Sell</TabsTrigger>
-				</TabsList>
+  return (
+    <div className="p-4 border rounded-lg bg-background w-full">
+      <div className="mb-4 text-sm text-muted-foreground">
+        Your Balance:{" "}
+        {isBalanceLoading
+          ? "..."
+          : `${balanceData?.formatted || "0"} ${balanceData?.symbol || ""}`}
+      </div>
+      <Tabs defaultValue="buy" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="buy">Buy</TabsTrigger>
+          <TabsTrigger value="sell">Sell</TabsTrigger>
+        </TabsList>
 
-				<Form {...form}>
-					<TabsContent value="buy">
-						<form
-							onSubmit={form.handleSubmit((values) => onSubmit(values, "buy"))}
-							className="space-y-4 mt-4"
-						>
-							<FormField
-								control={form.control}
-								name="amount"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Amount in ETH</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="0.0"
-												type="number"
-												step="any"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button type="submit" className="w-full" disabled={isPending}>
-								{isPending ? "Processing..." : "Buy"}
-							</Button>
-						</form>
-					</TabsContent>
-					<TabsContent value="sell">
-						<form
-							onSubmit={form.handleSubmit((values) => onSubmit(values, "sell"))}
-							className="space-y-4 mt-4"
-						>
-							<FormField
-								control={form.control}
-								name="amount"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Amount of Coins</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="0.0"
-												type="number"
-												step="any"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button type="submit" className="w-full" disabled={isPending}>
-								{isPending ? "Processing..." : "Sell"}
-							</Button>
-						</form>
-					</TabsContent>
-				</Form>
-			</Tabs>
-			<div className="mt-4">
-				<BuyCoinButton coinAddress={coinAddress} />
-			</div>
-		</div>
-	);
+        <Form {...form}>
+          <TabsContent value="buy">
+            <form
+              onSubmit={form.handleSubmit((values) => onSubmit(values, "buy"))}
+              className="space-y-4 mt-4"
+            >
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount in ETH</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="0.0"
+                        type="number"
+                        step="any"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Processing..." : "Buy"}
+              </Button>
+            </form>
+          </TabsContent>
+          <TabsContent value="sell">
+            <form
+              onSubmit={form.handleSubmit((values) => onSubmit(values, "sell"))}
+              className="space-y-4 mt-4"
+            >
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount of Coins</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="0.0"
+                        type="number"
+                        step="any"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Processing..." : "Sell"}
+              </Button>
+            </form>
+          </TabsContent>
+        </Form>
+      </Tabs>
+      <div className="mt-4">
+        <BuyCoinButton coinAddress={coinAddress} />
+      </div>
+    </div>
+  );
 }

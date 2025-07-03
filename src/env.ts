@@ -12,7 +12,6 @@ export const env = createEnv({
 	},
 	client: {
 		NEXT_PUBLIC_APP_URL: z.string().url(),
-		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string().min(1).optional(),
 		NEXT_PUBLIC_PRIVY_APP_ID: z.string().min(1),
 		NEXT_PUBLIC_SUPABASE_URL: z.string(),
 		NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
@@ -27,8 +26,6 @@ export const env = createEnv({
 		ZORA_API_KEY: process.env.ZORA_API_KEY,
 		PRIVY_APP_SECRET: process.env.PRIVY_APP_SECRET,
 		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-		NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
-			process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
 		NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
 		NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
 		NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

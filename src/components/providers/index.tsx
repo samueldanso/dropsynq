@@ -26,7 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 			config={{
 				appearance: {
 					theme: "dark",
-					logo: "https://synqbase.xyz/logo.png",
+					logo: "https://dropsynq.xyz/logo.png",
 				},
 				embeddedWallets: {
 					ethereum: {
