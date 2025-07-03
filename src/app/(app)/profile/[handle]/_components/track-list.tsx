@@ -1,10 +1,9 @@
 "use client";
 
 import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
-import type { ZoraCoin } from "@/types/zora";
 
 interface TrackListProps {
-	coins?: ZoraCoin[];
+	coins?: any[];
 }
 
 export function TrackList({ coins }: TrackListProps) {
