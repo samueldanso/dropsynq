@@ -1,10 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
+import { createCoin, DeployCurrency } from "@zoralabs/coins-sdk";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import type { Address } from "viem";
+import { createPublicClient, http } from "viem";
+import { base } from "viem/chains";
+import { useAccount, useWalletClient } from "wagmi";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,16 +31,22 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-// Form validation schema - minimal required fields
+// Form validation schema - minimal required fields for Zora coin creation
 const createSongSchema = z.object({
-	name: z.string().min(1, "Name is required"),
+	name: z.string().min(1, "Song name is required"),
+	symbol: z
+		.string()
+		.min(1, "Coin symbol is required")
+		.max(11, "Symbol must be 11 characters or less")
+		.regex(/^[A-Z0-9]+$/, "Symbol must be uppercase letters and numbers only"),
 	description: z.string().min(1, "Description is required"),
-	creator: z.string().min(1, "Creator is required"),
 	genre: z.string().min(1, "Genre is required"),
-	payoutRecipient: z.string().min(42, "Valid wallet address required"),
+	owners: z.string().optional(), // comma-separated addresses
 });
 
 type CreateSongFormData = z.infer<typeof createSongSchema>;
+
+const PLATFORM_REFERRER = "0xA44Fa8Ad3e905C8AB525cd0cb14319017F1e04e5";
 
 export default function CreateForm() {
 	const audioFileId = useId();
@@ -43,64 +55,110 @@ export default function CreateForm() {
 	const [coverImage, setCoverImage] = useState<File>();
 	const [isUploading, setIsUploading] = useState(false);
 	const router = useRouter();
+	const { address: userAddress } = useAccount();
+	const { data: walletClient } = useWalletClient();
 
 	const form = useForm<CreateSongFormData>({
 		resolver: zodResolver(createSongSchema),
 		defaultValues: {
 			name: "",
+			symbol: "",
 			description: "",
-			creator: "",
 			genre: "",
-			payoutRecipient: "",
+			owners: "",
 		},
 	});
+
+	// Step 1: Upload files and metadata to IPFS (backend)
+	const uploadToIPFS = async (data: CreateSongFormData) => {
+		const formData = new FormData();
+		Object.entries(data).forEach(([key, value]) => {
+			if (value) formData.append(key, value);
+		});
+		if (audioFile) formData.append("audioFile", audioFile);
+		if (coverImage) formData.append("coverImage", coverImage);
+
+		const response = await fetch("/api/songs/upload", {
+			method: "POST",
+			body: formData,
+		});
+		const result = await response.json();
+		if (!response.ok)
+			throw new Error(result.error || "Failed to upload metadata");
+		return result.metadataUri; // Expect backend to return metadataUri
+	};
+
+	// Step 2: Prepare coin params for Zora SDK
+	const prepareCoinParams = (data: CreateSongFormData, uri: string) => {
+		if (!userAddress) throw new Error("Wallet not connected");
+		let owners: Address[] | undefined;
+		if (data.owners && data.owners.trim().length > 0) {
+			owners = data.owners
+				.split(",")
+				.map((addr) => addr.trim() as Address)
+				.filter((addr) => addr.length > 0);
+		}
+		const params = {
+			name: data.name,
+			symbol: data.symbol,
+			uri: uri as ValidMetadataURI,
+			payoutRecipient: userAddress as Address,
+			platformReferrer: PLATFORM_REFERRER as Address,
+			owners,
+			chainId: base.id,
+			currency: DeployCurrency.ZORA,
+		};
+		return params;
+	};
 
 	const onSubmit = async (data: CreateSongFormData) => {
 		if (!audioFile || !coverImage) {
 			toast.error("Please select both audio file and cover image");
 			return;
 		}
-
+		if (!userAddress) {
+			toast.error("Connect your wallet to mint");
+			return;
+		}
+		if (!walletClient) {
+			toast.error("Wallet client not available");
+			return;
+		}
 		setIsUploading(true);
-
 		try {
-			const formData = new FormData();
-
-			// Add form fields
-			Object.entries(data).forEach(([key, value]) => {
-				if (value) formData.append(key, value);
+			// 1. Upload to IPFS
+			const uri = await uploadToIPFS(data);
+			// 2. Prepare coin params
+			const params = prepareCoinParams(data, uri);
+			// 3. Create public client for the correct chain
+			const publicClient = createPublicClient({
+				chain: base,
+				transport: http(),
 			});
-
-			// Add files
-			formData.append("audioFile", audioFile);
-			formData.append("coverImage", coverImage);
-
-			const response = await fetch("/api/songs/create", {
+			// 4. Call createCoin directly (no simulation)
+			const result = await createCoin(params, walletClient, publicClient, {
+				gasMultiplier: 120,
+			});
+			toast.success("Song coin minted! Waiting for confirmation...");
+			await fetch("/api/songs/save", {
 				method: "POST",
-				body: formData,
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					name: data.name,
+					description: data.description,
+					image_url: params.uri,
+					audio_url: params.uri,
+					metadata_url: params.uri,
+					coin_address: result.address,
+					creator_address: userAddress,
+				}),
 			});
-
-			const result = await response.json();
-
-			if (!response.ok) {
-				throw new Error(result.error || "Failed to create song coin");
-			}
-
-			toast.success("Song coin created successfully!");
-			console.log("Coin address:", result.coinAddress);
-			console.log("Transaction hash:", result.transactionHash);
-
-			// Redirect to the new track page
-			if (result.coinAddress) {
-				router.push(`/track/${result.coinAddress}`);
-			}
-
-			// Reset form
+			router.push(`/track/${result.address}`);
 			form.reset();
 			setAudioFile(undefined);
 			setCoverImage(undefined);
 		} catch (error) {
-			console.error("Error creating song coin:", error);
+			console.error("[CreateCoin] Error creating song coin:", error);
 			toast.error(
 				error instanceof Error ? error.message : "Failed to create song coin",
 			);
@@ -146,15 +204,21 @@ export default function CreateForm() {
 						)}
 					/>
 
-					{/* Creator */}
+					{/* Coin Symbol */}
 					<FormField
 						control={form.control}
-						name="creator"
+						name="symbol"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Artist</FormLabel>
+								<FormLabel>Coin Symbol</FormLabel>
 								<FormControl>
-									<Input placeholder="Enter artist name" {...field} />
+									<Input
+										placeholder="e.g., YSNG (max 11 chars, uppercase)"
+										{...field}
+										onChange={(e) =>
+											field.onChange(e.target.value.toUpperCase())
+										}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -213,17 +277,24 @@ export default function CreateForm() {
 						)}
 					/>
 
-					{/* Payout Recipient */}
+					{/* Additional Owners (comma-separated) */}
 					<FormField
 						control={form.control}
-						name="payoutRecipient"
+						name="owners"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Payout Wallet Address</FormLabel>
+								<FormLabel>Additional Owners (optional)</FormLabel>
 								<FormControl>
-									<Input placeholder="0x..." {...field} />
+									<Input
+										placeholder="0x123..., 0x456... (comma-separated)"
+										{...field}
+									/>
 								</FormControl>
 								<FormMessage />
+								<div className="text-xs text-muted-foreground">
+									Additional addresses that can manage this coin's metadata and
+									payouts
+								</div>
 							</FormItem>
 						)}
 					/>
@@ -268,7 +339,30 @@ export default function CreateForm() {
 
 					{/* Submit Button */}
 					<Button type="submit" className="w-full" disabled={isUploading}>
-						{isUploading ? "Creating Song Coin..." : "Create Song Coin"}
+						{isUploading ? (
+							<span className="flex items-center justify-center gap-2">
+								<svg className="animate-spin size-4" viewBox="0 0 24 24">
+									<title>Loading</title>
+									<circle
+										className="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										strokeWidth="4"
+										fill="none"
+									/>
+									<path
+										className="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8v8z"
+									/>
+								</svg>
+								Creating Song Coin...
+							</span>
+						) : (
+							"Create Song Coin"
+						)}
 					</Button>
 				</form>
 			</Form>

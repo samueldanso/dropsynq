@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-// This component will be a hero/banner section for the top of the feed.
 export default function HeroBanner() {
 	return (
 		<div className="relative overflow-hidden rounded-xl bg-card">
