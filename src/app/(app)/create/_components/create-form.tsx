@@ -106,7 +106,7 @@ export default function CreateForm() {
       platformReferrer: PLATFORM_REFERRER as Address,
       owners,
       chainId: baseSepolia.id,
-      currency: DeployCurrency.ZORA,
+      currency: DeployCurrency.ETH,
     };
     return params;
   };
