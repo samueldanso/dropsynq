@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { Address } from "viem";
 import { createPublicClient, http } from "viem";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { useAccount, useWalletClient } from "wagmi";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -105,7 +105,7 @@ export default function CreateForm() {
       payoutRecipient: userAddress as Address,
       platformReferrer: PLATFORM_REFERRER as Address,
       owners,
-      chainId: base.id,
+      chainId: baseSepolia.id,
       currency: DeployCurrency.ZORA,
     };
     return params;
@@ -132,7 +132,7 @@ export default function CreateForm() {
       const params = prepareCoinParams(data, uri);
       // 3. Create public client for the correct chain
       const publicClient = createPublicClient({
-        chain: base,
+        chain: baseSepolia,
         transport: http(),
       });
       // 4. Call createCoin directly (no simulation)
