@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { baseSepolia } from "viem/chains";
 
 // Form validation schema - minimal required fields for Zora coin creation
 const createSongSchema = z.object({
@@ -87,16 +88,17 @@ export default function CreateForm() {
   const prepareCoinParams = (data: CreateSongFormData, uri: string) => {
     if (!userAddress) throw new Error("Wallet not connected");
 
-    return {
+    const params = {
       name: data.name,
       symbol: data.symbol,
       uri: uri as ValidMetadataURI,
       payoutRecipient: userAddress as `0x${string}`,
-      // Optional: Add platform referrer for your platform
+      chainId: baseSepolia.id, // Explicitly set for testnet
       // platformReferrer: "0xYourPlatformAddress" as `0x${string}`,
-      // Optional: Set initial purchase to 0 for no initial liquidity
       // initialPurchaseWei: 0n,
     };
+    console.log("[CreateCoin] Prepared Coin Params (with chainId):", params);
+    return params;
   };
 
   // Step 3: Simulate and write contract (moved to effect)
