@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
 import { createCoinCall } from "@zoralabs/coins-sdk";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
@@ -50,7 +50,9 @@ export default function CreateForm() {
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
   const { address: userAddress } = useAccount();
-  const [coinParams, setCoinParams] = useState<any>(null);
+  const [pendingCoinParams, setPendingCoinParams] = useState<any>(null);
+  const [pendingFormData, setPendingFormData] =
+    useState<CreateSongFormData | null>(null);
 
   const form = useForm<CreateSongFormData>({
     resolver: zodResolver(createSongSchema),
@@ -97,17 +99,74 @@ export default function CreateForm() {
     };
   };
 
-  // Step 3: Simulate and write contract
+  // Step 3: Simulate and write contract (moved to effect)
   const {
     data: simulation,
     isLoading: isSimulating,
     error: simulationError,
   } = useSimulateContract(
-    coinParams
-      ? { ...(createCoinCall(coinParams) as any), account: userAddress }
+    pendingCoinParams
+      ? { ...(createCoinCall(pendingCoinParams) as any), account: userAddress }
       : undefined
   );
-  const { writeContractAsync, isPending: isMinting } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
+
+  // Effect: When simulation is ready and pendingCoinParams is set, mint the coin
+  useEffect(() => {
+    async function handleMint() {
+      if (!pendingCoinParams || !pendingFormData) return;
+      if (!simulation || !simulation.request) {
+        console.error("[CreateCoin] Simulation failed", { simulation });
+        toast.error("Simulation failed. Please check your input.");
+        setIsUploading(false);
+        setPendingCoinParams(null);
+        setPendingFormData(null);
+        return;
+      }
+      const { request } = simulation;
+      console.log("[CreateCoin] Simulation Success. Request:", request);
+      try {
+        const tx = await writeContractAsync(request);
+        console.log("[CreateCoin] Mint Transaction Response:", tx);
+        toast.success("Song coin minted! Waiting for confirmation...");
+        await fetch("/api/songs/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: pendingFormData.name,
+            description: pendingFormData.description,
+            image_url: pendingCoinParams.uri,
+            audio_url: pendingCoinParams.uri,
+            metadata_url: pendingCoinParams.uri,
+            coin_address: tx,
+            creator_address: userAddress,
+          }),
+        });
+        router.push(`/track/${tx}`);
+        form.reset();
+        setAudioFile(undefined);
+        setCoverImage(undefined);
+      } catch (error) {
+        console.error("[CreateCoin] Error creating song coin:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create song coin"
+        );
+      } finally {
+        setIsUploading(false);
+        setPendingCoinParams(null);
+        setPendingFormData(null);
+      }
+    }
+    handleMint();
+  }, [
+    simulation,
+    writeContractAsync,
+    router,
+    form,
+    pendingCoinParams,
+    pendingFormData,
+    userAddress,
+  ]);
 
   const onSubmit = async (data: CreateSongFormData) => {
     if (!audioFile || !coverImage) {
@@ -122,54 +181,17 @@ export default function CreateForm() {
     try {
       // 1. Upload to IPFS
       const uri = await uploadToIPFS(data);
-
       // 2. Prepare coin params
       const params = prepareCoinParams(data, uri);
-      setCoinParams(params);
       console.log("[CreateCoin] Coin Params:", params);
-
-      // 3. Simulate contract
-      const contractCall = createCoinCall(params);
-      console.log("[CreateCoin] Contract Call Params:", contractCall);
-      if (!simulation || !simulation.request) {
-        console.error("[CreateCoin] Simulation failed", { simulation });
-        toast.error("Simulation failed. Please check your input.");
-        setIsUploading(false);
-        return;
-      }
-      const { request } = simulation;
-      console.log("[CreateCoin] Simulation Success. Request:", request);
-
-      // 4. Mint coin
-      const tx = await writeContractAsync(request);
-      console.log("[CreateCoin] Mint Transaction Response:", tx);
-      toast.success("Song coin minted! Waiting for confirmation...");
-
-      // 5. Save to DB
-      await fetch("/api/songs/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          description: data.description,
-          image_url: uri, // or extract from metadata
-          audio_url: uri, // or extract from metadata
-          metadata_url: uri,
-          coin_address: tx, // or extract from receipt
-          creator_address: userAddress, // Use connected wallet
-        }),
-      });
-
-      router.push(`/track/${tx}`);
-      form.reset();
-      setAudioFile(undefined);
-      setCoverImage(undefined);
+      console.log("[CreateCoin] Contract Call Params:", createCoinCall(params));
+      setPendingCoinParams(params);
+      setPendingFormData(data);
     } catch (error) {
-      console.error("[CreateCoin] Error creating song coin:", error);
+      console.error("[CreateCoin] Error before simulation:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to create song coin"
       );
-    } finally {
       setIsUploading(false);
     }
   };
