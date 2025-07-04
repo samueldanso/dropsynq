@@ -1,10 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
+import { createCoinCall } from "@zoralabs/coins-sdk";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +28,16 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-// Form validation schema - minimal required fields
+// Form validation schema - minimal required fields for Zora coin creation
 const createSongSchema = z.object({
-	name: z.string().min(1, "Name is required"),
+	name: z.string().min(1, "Song name is required"),
+	symbol: z
+		.string()
+		.min(1, "Coin symbol is required")
+		.max(11, "Symbol must be 11 characters or less")
+		.regex(/^[A-Z0-9]+$/, "Symbol must be uppercase letters and numbers only"),
 	description: z.string().min(1, "Description is required"),
-	creator: z.string().min(1, "Creator is required"),
 	genre: z.string().min(1, "Genre is required"),
-	payoutRecipient: z.string().min(42, "Valid wallet address required"),
 });
 
 type CreateSongFormData = z.infer<typeof createSongSchema>;
@@ -43,59 +49,115 @@ export default function CreateForm() {
 	const [coverImage, setCoverImage] = useState<File>();
 	const [isUploading, setIsUploading] = useState(false);
 	const router = useRouter();
+	const { address: userAddress } = useAccount();
+	const [metadataUri, setMetadataUri] = useState<string | null>(null);
+	const [coinParams, setCoinParams] = useState<any>(null);
 
 	const form = useForm<CreateSongFormData>({
 		resolver: zodResolver(createSongSchema),
 		defaultValues: {
 			name: "",
+			symbol: "",
 			description: "",
-			creator: "",
 			genre: "",
-			payoutRecipient: "",
 		},
 	});
+
+	// Step 1: Upload files and metadata to IPFS (backend)
+	const uploadToIPFS = async (data: CreateSongFormData) => {
+		const formData = new FormData();
+		Object.entries(data).forEach(([key, value]) => {
+			if (value) formData.append(key, value);
+		});
+		if (audioFile) formData.append("audioFile", audioFile);
+		if (coverImage) formData.append("coverImage", coverImage);
+
+		const response = await fetch("/api/songs/upload", {
+			method: "POST",
+			body: formData,
+		});
+		const result = await response.json();
+		if (!response.ok)
+			throw new Error(result.error || "Failed to upload metadata");
+		return result.metadataUri; // Expect backend to return metadataUri
+	};
+
+	// Step 2: Prepare coin params for Zora SDK
+	const prepareCoinParams = (data: CreateSongFormData, uri: string) => {
+		if (!userAddress) throw new Error("Wallet not connected");
+
+		return {
+			name: data.name,
+			symbol: data.symbol,
+			uri: uri as ValidMetadataURI,
+			payoutRecipient: userAddress as `0x${string}`,
+			// Optional: Add platform referrer for your platform
+			// platformReferrer: "0xYourPlatformAddress" as `0x${string}`,
+			// Optional: Set initial purchase to 0 for no initial liquidity
+			// initialPurchaseWei: 0n,
+		};
+	};
+
+	// Step 3: Simulate and write contract
+	const {
+		data: simulation,
+		isLoading: isSimulating,
+		error: simulationError,
+	} = useSimulateContract(
+		coinParams
+			? { ...(createCoinCall(coinParams) as any), account: userAddress }
+			: undefined,
+	);
+	const { writeContractAsync, isPending: isMinting } = useWriteContract();
 
 	const onSubmit = async (data: CreateSongFormData) => {
 		if (!audioFile || !coverImage) {
 			toast.error("Please select both audio file and cover image");
 			return;
 		}
-
+		if (!userAddress) {
+			toast.error("Connect your wallet to mint");
+			return;
+		}
 		setIsUploading(true);
-
 		try {
-			const formData = new FormData();
+			// 1. Upload to IPFS
+			const uri = await uploadToIPFS(data);
+			setMetadataUri(uri);
 
-			// Add form fields
-			Object.entries(data).forEach(([key, value]) => {
-				if (value) formData.append(key, value);
-			});
+			// 2. Prepare coin params
+			const params = prepareCoinParams(data, uri);
+			setCoinParams(params);
 
-			// Add files
-			formData.append("audioFile", audioFile);
-			formData.append("coverImage", coverImage);
+			// 3. Simulate contract
+			const contractCall = createCoinCall(params);
+			if (!simulation || !simulation.request) {
+				toast.error("Simulation failed. Please check your input.");
+				setIsUploading(false);
+				return;
+			}
+			const { request } = simulation;
 
-			const response = await fetch("/api/songs/create", {
+			// 4. Mint coin
+			const tx = await writeContractAsync(request);
+			toast.success("Song coin minted! Waiting for confirmation...");
+
+			// 5. Save to DB
+			await fetch("/api/songs/save", {
 				method: "POST",
-				body: formData,
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					name: data.name,
+					description: data.description,
+					image_url: uri, // or extract from metadata
+					audio_url: uri, // or extract from metadata
+					metadata_url: uri,
+					coin_address: tx, // or extract from receipt
+					creator_address: userAddress, // Use connected wallet
+				}),
 			});
 
-			const result = await response.json();
-
-			if (!response.ok) {
-				throw new Error(result.error || "Failed to create song coin");
-			}
-
-			toast.success("Song coin created successfully!");
-			console.log("Coin address:", result.coinAddress);
-			console.log("Transaction hash:", result.transactionHash);
-
-			// Redirect to the new track page
-			if (result.coinAddress) {
-				router.push(`/track/${result.coinAddress}`);
-			}
-
-			// Reset form
+			router.push(`/track/${tx}`);
 			form.reset();
 			setAudioFile(undefined);
 			setCoverImage(undefined);
@@ -137,7 +199,7 @@ export default function CreateForm() {
 						name="name"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Title</FormLabel>
+								<FormLabel>Song Title</FormLabel>
 								<FormControl>
 									<Input placeholder="Enter song title" {...field} />
 								</FormControl>
@@ -146,15 +208,21 @@ export default function CreateForm() {
 						)}
 					/>
 
-					{/* Creator */}
+					{/* Coin Symbol */}
 					<FormField
 						control={form.control}
-						name="creator"
+						name="symbol"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Artist</FormLabel>
+								<FormLabel>Coin Symbol</FormLabel>
 								<FormControl>
-									<Input placeholder="Enter artist name" {...field} />
+									<Input
+										placeholder="e.g., YSNG (max 11 chars, uppercase)"
+										{...field}
+										onChange={(e) =>
+											field.onChange(e.target.value.toUpperCase())
+										}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -208,21 +276,6 @@ export default function CreateForm() {
 										<SelectItem value="Other">Other</SelectItem>
 									</SelectContent>
 								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* Payout Recipient */}
-					<FormField
-						control={form.control}
-						name="payoutRecipient"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Payout Wallet Address</FormLabel>
-								<FormControl>
-									<Input placeholder="0x..." {...field} />
-								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}

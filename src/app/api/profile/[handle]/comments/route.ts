@@ -1,3 +1,4 @@
+import "@/lib/zora";
 import { getProfile } from "@zoralabs/coins-sdk";
 import { desc, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";

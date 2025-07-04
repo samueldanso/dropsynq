@@ -1,30 +1,30 @@
 import { validateMetadataJSON } from "@zoralabs/coins-sdk";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
-import { tracks } from "@/lib/db/schemas/tracks";
 import { uploadFileToIPFS } from "@/lib/pinata";
-import { createSongCoin } from "@/lib/zora/create-coin";
 
-// Form data validation schema - minimal required fields
+// Form data validation schema - updated for new form structure
 const createSongSchema = z.object({
-	name: z.string().min(1, "Name is required"),
+	name: z.string().min(1, "Song name is required"),
+	symbol: z
+		.string()
+		.min(1, "Coin symbol is required")
+		.max(11, "Symbol must be 11 characters or less")
+		.regex(/^[A-Z0-9]+$/, "Symbol must be uppercase letters and numbers only"),
 	description: z.string().min(1, "Description is required"),
-	creator: z.string().min(1, "Creator is required"),
 	genre: z.string().min(1, "Genre is required"),
-	payoutRecipient: z.string().min(42, "Valid wallet address required"),
 });
 
+// This endpoint handles file and metadata upload to IPFS for Zora coin creation
 export async function POST(request: NextRequest) {
 	try {
 		const formData = await request.formData();
 
 		// Extract form fields
 		const name = formData.get("name") as string;
+		const symbol = formData.get("symbol") as string;
 		const description = formData.get("description") as string;
-		const creator = formData.get("creator") as string;
 		const genre = formData.get("genre") as string;
-		const payoutRecipient = formData.get("payoutRecipient") as string;
 
 		// Extract files
 		const audioFile = formData.get("audioFile") as File;
@@ -33,10 +33,9 @@ export async function POST(request: NextRequest) {
 		// Validate form data
 		const validatedData = createSongSchema.parse({
 			name,
+			symbol,
 			description,
-			creator,
 			genre,
-			payoutRecipient,
 		});
 
 		if (!audioFile || !coverImage) {
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Step 3: Create metadata JSON
+		// Step 3: Create metadata JSON for Zora coin
 		const metadata = {
 			name: validatedData.name,
 			description: validatedData.description,
@@ -77,7 +76,8 @@ export async function POST(request: NextRequest) {
 			properties: {
 				category: "music",
 				genre: validatedData.genre,
-				creator: validatedData.creator,
+				symbol: validatedData.symbol,
+				// Note: creator will be determined by the connected wallet during coin creation
 			},
 		};
 
@@ -107,45 +107,10 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Step 6: Create coin using Zora SDK
-		const coinResult = await createSongCoin({
-			name: validatedData.name,
-			symbol: validatedData.name.substring(0, 3).toUpperCase(), // Simple symbol generation
-			uri: `ipfs://${metadataUpload.cid}`,
-			payoutRecipient: validatedData.payoutRecipient as `0x${string}`,
-		});
-
-		if (!coinResult.success || !coinResult.address) {
-			return NextResponse.json(
-				{ error: coinResult.error || "Failed to create coin" },
-				{ status: 500 },
-			);
-		}
-
-		// Step 7: Save track data to our database
-		try {
-			await db.insert(tracks).values({
-				name: validatedData.name,
-				description: validatedData.description,
-				image_url: metadata.image,
-				audio_url: metadata.animation_url,
-				metadata_url: `ipfs://${metadataUpload.cid}`,
-				coin_address: coinResult.address,
-				creator_address: validatedData.payoutRecipient,
-			});
-		} catch (dbError) {
-			// If DB write fails, it's not a critical error for the user
-			// Log it for monitoring, but don't fail the request
-			console.error("Failed to save track to database:", dbError);
-		}
-
-		return NextResponse.json({
-			success: true,
-			coinAddress: coinResult.address,
-			transactionHash: coinResult.hash,
-		});
+		// Return only the metadata URI for frontend coin creation
+		return NextResponse.json({ metadataUri: `ipfs://${metadataUpload.cid}` });
 	} catch (error) {
-		console.error("Error creating song coin:", error);
+		console.error("Error uploading song files/metadata:", error);
 		return NextResponse.json(
 			{ error: "Internal server error" },
 			{ status: 500 },
