@@ -1,88 +1,84 @@
 "use client";
 
-import { useWallets } from "@privy-io/react-auth";
+import { type TradeParameters, tradeCoin } from "@zoralabs/coins-sdk";
 import { useState } from "react";
-import { toast } from "sonner";
-import { parseEther } from "viem";
-import { useConfig, useWriteContract } from "wagmi";
-import { simulateContract } from "wagmi/actions";
+import { createPublicClient, http, parseEther } from "viem";
+import { base } from "viem/chains";
+import { useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 
-// import { tradeCoinCall } from "@zoralabs/coins-sdk"; // Temporarily disabled due to SDK issue
+const PLATFORM_REFERRER = "0xA44Fa8Ad3e905C8AB525cd0cb14319017F1e04e5";
+const SLIPPAGE = 0.05;
 
 interface BuyCoinButtonProps {
 	coinAddress: string;
-	amount?: string; // Optional, default to "1"
+	amount?: string; // Optional, default to "0.01"
 }
 
-export function BuyCoinButton({
+export default function BuyCoinButton({
 	coinAddress,
-	amount = "1",
+	amount = "0.01",
 }: BuyCoinButtonProps) {
-	const { wallets } = useWallets();
-	const config = useConfig();
-	const { writeContractAsync, isPending } = useWriteContract();
+	const { data: walletClient } = useWalletClient();
 	const [isLoading, setIsLoading] = useState(false);
+	const [txStatus, setTxStatus] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
-	const embeddedWallet = wallets.find(
-		(wallet) => wallet.walletClientType === "privy",
-	);
+	const isBase = walletClient?.chain?.id === base.id;
 
 	const handleBuy = async () => {
-		// Temporarily disabled due to Zora SDK tradeCoinCall issue
-		toast.info(
-			"Buy functionality is temporarily disabled. Zora team is working on a fix.",
-		);
-		return;
-
-		/*
-    if (!embeddedWallet?.address) {
-      toast.error("No connected wallet found.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const tradeParams = {
-        direction: "buy",
-        target: coinAddress as `0x${string}`,
-        args: {
-          recipient: embeddedWallet.address as `0x${string}`,
-          orderSize: parseEther(amount),
-        },
-      };
-
-      const contractCallParams = tradeCoinCall(tradeParams);
-
-      const { request } = await simulateContract(config, {
-        ...contractCallParams,
-        value: parseEther(amount),
-        account: embeddedWallet.address as `0x${string}`,
-      });
-
-      await writeContractAsync(request);
-
-      toast.success("Successfully bought coin!");
-    } catch (error) {
-      console.error("Buy failed:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Buy execution failed"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-    */
+		setError(null);
+		setTxStatus(null);
+		if (!walletClient || !walletClient.account) {
+			setError("Connect your wallet to buy");
+			return;
+		}
+		if (!isBase) {
+			setError("Switch to Base Mainnet to buy");
+			return;
+		}
+		setIsLoading(true);
+		try {
+			const publicClient = createPublicClient({
+				chain: base,
+				transport: http(),
+			});
+			const tradeParameters: TradeParameters = {
+				sell: { type: "eth" as const },
+				buy: { type: "erc20" as const, address: coinAddress as `0x${string}` },
+				amountIn: parseEther(amount),
+				slippage: SLIPPAGE,
+				sender: walletClient.account.address,
+				recipient: walletClient.account.address,
+			};
+			const result = await tradeCoin({
+				tradeParameters,
+				walletClient,
+				account: walletClient.account,
+				publicClient,
+			});
+			setTxStatus(`Success! Tx: ${result.hash}`);
+		} catch (err: any) {
+			setError(err?.message || "Buy failed");
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
-		<Button
-			onClick={handleBuy}
-			disabled
-			className="w-full"
-			title="Buy is temporarily disabled due to SDK issue."
-		>
-			Buy (Temporarily Disabled)
-		</Button>
+		<div>
+			<Button
+				onClick={handleBuy}
+				disabled={isLoading || !isBase}
+				className="w-full bg-primary text-primary-foreground py-2 rounded"
+				title={!isBase ? "Switch to Base Mainnet to buy" : ""}
+			>
+				{isLoading ? "Processing..." : `Buy ${amount} ETH worth`}
+			</Button>
+			{txStatus && (
+				<div className="mt-2 text-green-600 text-sm">{txStatus}</div>
+			)}
+			{error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
+		</div>
 	);
 }
-
-export default BuyCoinButton;
