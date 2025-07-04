@@ -2,12 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
-import { createCoinCall } from "@zoralabs/coins-sdk";
+import { createCoin, DeployCurrency } from "@zoralabs/coins-sdk";
 import { useRouter } from "next/navigation";
-import { useId, useState, useEffect } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
+import type { Address } from "viem";
+import { createPublicClient, http } from "viem";
+import { base } from "viem/chains";
+import { useAccount, useWalletClient } from "wagmi";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +30,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { baseSepolia } from "viem/chains";
 
 // Form validation schema - minimal required fields for Zora coin creation
 const createSongSchema = z.object({
@@ -39,9 +41,12 @@ const createSongSchema = z.object({
     .regex(/^[A-Z0-9]+$/, "Symbol must be uppercase letters and numbers only"),
   description: z.string().min(1, "Description is required"),
   genre: z.string().min(1, "Genre is required"),
+  owners: z.string().optional(), // comma-separated addresses
 });
 
 type CreateSongFormData = z.infer<typeof createSongSchema>;
+
+const PLATFORM_REFERRER = "0xA44Fa8Ad3e905C8AB525cd0cb14319017F1e04e5";
 
 export default function CreateForm() {
   const audioFileId = useId();
@@ -51,9 +56,7 @@ export default function CreateForm() {
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
   const { address: userAddress } = useAccount();
-  const [pendingCoinParams, setPendingCoinParams] = useState<any>(null);
-  const [pendingFormData, setPendingFormData] =
-    useState<CreateSongFormData | null>(null);
+  const { data: walletClient } = useWalletClient();
 
   const form = useForm<CreateSongFormData>({
     resolver: zodResolver(createSongSchema),
@@ -62,6 +65,7 @@ export default function CreateForm() {
       symbol: "",
       description: "",
       genre: "",
+      owners: "",
     },
   });
 
@@ -87,88 +91,25 @@ export default function CreateForm() {
   // Step 2: Prepare coin params for Zora SDK
   const prepareCoinParams = (data: CreateSongFormData, uri: string) => {
     if (!userAddress) throw new Error("Wallet not connected");
-
+    let owners: Address[] | undefined;
+    if (data.owners && data.owners.trim().length > 0) {
+      owners = data.owners
+        .split(",")
+        .map((addr) => addr.trim() as Address)
+        .filter((addr) => addr.length > 0);
+    }
     const params = {
       name: data.name,
       symbol: data.symbol,
       uri: uri as ValidMetadataURI,
-      payoutRecipient: userAddress as `0x${string}`,
-      chainId: baseSepolia.id, // Explicitly set for testnet
-      // platformReferrer: "0xYourPlatformAddress" as `0x${string}`,
-      // initialPurchaseWei: 0n,
+      payoutRecipient: userAddress as Address,
+      platformReferrer: PLATFORM_REFERRER as Address,
+      owners,
+      chainId: base.id,
+      currency: DeployCurrency.ZORA,
     };
-    console.log("[CreateCoin] Prepared Coin Params (with chainId):", params);
     return params;
   };
-
-  // Step 3: Simulate and write contract (moved to effect)
-  const {
-    data: simulation,
-    isLoading: isSimulating,
-    error: simulationError,
-  } = useSimulateContract(
-    pendingCoinParams
-      ? { ...(createCoinCall(pendingCoinParams) as any), account: userAddress }
-      : undefined
-  );
-  const { writeContractAsync } = useWriteContract();
-
-  // Effect: When simulation is ready and pendingCoinParams is set, mint the coin
-  useEffect(() => {
-    async function handleMint() {
-      if (!pendingCoinParams || !pendingFormData) return;
-      if (!simulation || !simulation.request) {
-        console.error("[CreateCoin] Simulation failed", { simulation });
-        toast.error("Simulation failed. Please check your input.");
-        setIsUploading(false);
-        setPendingCoinParams(null);
-        setPendingFormData(null);
-        return;
-      }
-      const { request } = simulation;
-      console.log("[CreateCoin] Simulation Success. Request:", request);
-      try {
-        const tx = await writeContractAsync(request);
-        console.log("[CreateCoin] Mint Transaction Response:", tx);
-        toast.success("Song coin minted! Waiting for confirmation...");
-        await fetch("/api/songs/save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: pendingFormData.name,
-            description: pendingFormData.description,
-            image_url: pendingCoinParams.uri,
-            audio_url: pendingCoinParams.uri,
-            metadata_url: pendingCoinParams.uri,
-            coin_address: tx,
-            creator_address: userAddress,
-          }),
-        });
-        router.push(`/track/${tx}`);
-        form.reset();
-        setAudioFile(undefined);
-        setCoverImage(undefined);
-      } catch (error) {
-        console.error("[CreateCoin] Error creating song coin:", error);
-        toast.error(
-          error instanceof Error ? error.message : "Failed to create song coin"
-        );
-      } finally {
-        setIsUploading(false);
-        setPendingCoinParams(null);
-        setPendingFormData(null);
-      }
-    }
-    handleMint();
-  }, [
-    simulation,
-    writeContractAsync,
-    router,
-    form,
-    pendingCoinParams,
-    pendingFormData,
-    userAddress,
-  ]);
 
   const onSubmit = async (data: CreateSongFormData) => {
     if (!audioFile || !coverImage) {
@@ -179,21 +120,49 @@ export default function CreateForm() {
       toast.error("Connect your wallet to mint");
       return;
     }
+    if (!walletClient) {
+      toast.error("Wallet client not available");
+      return;
+    }
     setIsUploading(true);
     try {
       // 1. Upload to IPFS
       const uri = await uploadToIPFS(data);
       // 2. Prepare coin params
       const params = prepareCoinParams(data, uri);
-      console.log("[CreateCoin] Coin Params:", params);
-      console.log("[CreateCoin] Contract Call Params:", createCoinCall(params));
-      setPendingCoinParams(params);
-      setPendingFormData(data);
+      // 3. Create public client for the correct chain
+      const publicClient = createPublicClient({
+        chain: base,
+        transport: http(),
+      });
+      // 4. Call createCoin directly (no simulation)
+      const result = await createCoin(params, walletClient, publicClient, {
+        gasMultiplier: 120,
+      });
+      toast.success("Song coin minted! Waiting for confirmation...");
+      await fetch("/api/songs/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+          image_url: params.uri,
+          audio_url: params.uri,
+          metadata_url: params.uri,
+          coin_address: result.address,
+          creator_address: userAddress,
+        }),
+      });
+      router.push(`/track/${result.address}`);
+      form.reset();
+      setAudioFile(undefined);
+      setCoverImage(undefined);
     } catch (error) {
-      console.error("[CreateCoin] Error before simulation:", error);
+      console.error("[CreateCoin] Error creating song coin:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to create song coin"
       );
+    } finally {
       setIsUploading(false);
     }
   };
@@ -304,6 +273,28 @@ export default function CreateForm() {
                   </SelectContent>
                 </Select>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Additional Owners (comma-separated) */}
+          <FormField
+            control={form.control}
+            name="owners"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Additional Owners (optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="0x123..., 0x456... (comma-separated)"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+                <div className="text-xs text-muted-foreground">
+                  Additional addresses that can manage this coin's metadata and
+                  payouts
+                </div>
               </FormItem>
             )}
           />

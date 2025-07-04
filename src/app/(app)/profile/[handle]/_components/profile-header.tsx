@@ -77,7 +77,7 @@ export function ProfileHeader({ profile, balances }: ProfileHeaderProps) {
 			<div className="flex w-full justify-center">
 				{isOwnProfile ? (
 					<a
-						href={`https://testnet.zora.co/${
+						href={`https://zora.co/${
 							profile.handle
 								? `@${profile.handle}`
 								: profile.publicWallet?.walletAddress
