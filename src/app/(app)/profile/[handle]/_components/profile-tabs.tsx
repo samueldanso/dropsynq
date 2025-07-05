@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { ZoraCoin, ZoraProfile } from "@/types/zora";
 import { Collections } from "./collections";
 import { TrackList } from "./track-list";
+import { UpcomingDrops } from "./upcoming-drops";
 
 type CoinBalanceNode = NonNullable<
 	GetProfileBalancesResponse["profile"]
@@ -21,6 +22,7 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 	const tabs = [
 		{ id: "drops", label: "Drops" },
 		{ id: "collection", label: "Collections" },
+		{ id: "upcoming", label: "Upcoming" },
 	];
 
 	return (
@@ -46,6 +48,7 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 			{/* Tab Content */}
 			{activeTab === "drops" && <TrackList coins={coins} />}
 			{activeTab === "collection" && <Collections balances={balances} />}
+			{activeTab === "upcoming" && <UpcomingDrops />}
 		</div>
 	);
 }
