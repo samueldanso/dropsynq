@@ -66,9 +66,11 @@ export function AppSidebar() {
     return (
       <div
         className={cn(
-          "flex h-full flex-col transition-all duration-200 bg-background",
-          "w-16",
-          "pl-4"
+          // Floating card style for collapsed sidebar
+          "flex h-full flex-col transition-all duration-200",
+          "w-16 pl-4",
+          "bg-card rounded-2xl shadow-lg border",
+          "my-4 ml-4" // margin to float from top/left
         )}
       >
         {/* Top: Icon only */}
