@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ValidMetadataURI } from "@zoralabs/coins-sdk";
 import { createCoin, DeployCurrency } from "@zoralabs/coins-sdk";
+import { usePrivy } from "@privy-io/react-auth";
 import { Image as ImageIcon, Music, Pause, Play, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -201,6 +202,7 @@ export default function CreateForm() {
   const router = useRouter();
   const { address: userAddress } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { authenticated, login } = usePrivy();
 
   const form = useForm<CreateSongFormData>({
     resolver: zodResolver(createSongSchema),
@@ -285,6 +287,11 @@ export default function CreateForm() {
   };
 
   const onSubmit = async (data: CreateSongFormData) => {
+    if (!authenticated) {
+      login();
+      return;
+    }
+
     if (!audioFile || !coverImage) {
       toast.error("Please select both audio file and cover image");
       return;
@@ -338,6 +345,16 @@ export default function CreateForm() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {/* Authentication Notice */}
+      {!authenticated && (
+        <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-muted-foreground/20">
+          <p className="text-sm text-muted-foreground text-center">
+            💡 You can explore the form below, but you'll need to sign in to
+            create your song coin.
+          </p>
+        </div>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* File Uploads Section */}
@@ -540,8 +557,10 @@ export default function CreateForm() {
                   </svg>
                   Creating Song Coin...
                 </span>
-              ) : (
+              ) : authenticated ? (
                 "Create Song Coin"
+              ) : (
+                "Sign In to Create"
               )}
             </Button>
           </div>
