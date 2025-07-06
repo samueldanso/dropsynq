@@ -380,10 +380,7 @@ export default function CreateForm() {
                 }
                 onRemove={removeAudio}
               />
-              <div
-                className="text-xs mt-2"
-                style={{ color: "#FF9900", opacity: 0.7 }}
-              >
+              <div className="text-xs text-muted-foreground mt-2">
                 Supported: mp3, wav. Max 5MB.
               </div>
             </div>
@@ -407,10 +404,7 @@ export default function CreateForm() {
                 }
                 onRemove={removeImage}
               />
-              <div
-                className="text-xs mt-2"
-                style={{ color: "#FF9900", opacity: 0.7 }}
-              >
+              <div className="text-xs text-muted-foreground mt-2">
                 Supported: jpg, png, gif. Max 2MB.
               </div>
             </div>
@@ -420,7 +414,7 @@ export default function CreateForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel className="text-primary">Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter song title"
@@ -441,7 +435,7 @@ export default function CreateForm() {
               name="symbol"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Symbol</FormLabel>
+                  <FormLabel className="text-primary">Symbol</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="SONG"
@@ -468,7 +462,7 @@ export default function CreateForm() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="text-primary">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Describe your song / lyrics..."
@@ -489,7 +483,7 @@ export default function CreateForm() {
               name="genre"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Genre</FormLabel>
+                  <FormLabel className="text-primary">Genre</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
