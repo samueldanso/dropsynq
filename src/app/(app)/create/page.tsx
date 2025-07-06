@@ -1,3 +1,5 @@
+"use client";
+
 import CreateForm from "./_components/create-form";
 
 export default function CreatePage() {
