@@ -215,14 +215,22 @@ export default function CreateForm() {
     },
   });
 
-  // Handle file selection with preview
+  // Handle file selection with preview and size check
   const handleAudioSelect = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Audio file must be 5MB or less");
+      return;
+    }
     setAudioFile(file);
     const url = URL.createObjectURL(file);
     setAudioPreview(url);
   };
 
   const handleImageSelect = (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be 2MB or less");
+      return;
+    }
     setCoverImage(file);
     const url = URL.createObjectURL(file);
     setImagePreview(url);
@@ -344,228 +352,165 @@ export default function CreateForm() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Authentication Notice */}
-      {!authenticated && (
-        <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-muted-foreground/20">
-          <p className="text-sm text-muted-foreground text-center">
-            💡 You can explore the form below, but you'll need to sign in to
-            create your song coin.
-          </p>
-        </div>
-      )}
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* File Uploads Section */}
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Upload Your Music</h2>
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-4">
-                  <div className="text-sm font-medium">Audio File</div>
-                  <FileUpload
-                    onFileSelect={handleAudioSelect}
-                    acceptedTypes="audio/*"
-                    label="Upload Audio"
-                    icon={Music}
-                    preview={
-                      audioFile && audioPreview
-                        ? { file: audioFile, url: audioPreview }
-                        : undefined
-                    }
-                    onRemove={removeAudio}
-                  />
-                </div>
-                <div className="space-y-4">
-                  <div className="text-sm font-medium">Cover Image</div>
-                  <FileUpload
-                    onFileSelect={handleImageSelect}
-                    acceptedTypes="image/*"
-                    label="Upload Cover"
-                    icon={ImageIcon}
-                    preview={
-                      coverImage && imagePreview
-                        ? { file: coverImage, url: imagePreview }
-                        : undefined
-                    }
-                    onRemove={removeImage}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Song Details Section */}
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Song Details</h2>
-              <div className="grid gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Song Title</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter song title"
-                          {...field}
-                          className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="symbol"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Coin Symbol</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., YSNG"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.toUpperCase())
-                          }
-                          className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20 font-mono"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Max 11 characters, uppercase letters and numbers only
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe your song, inspiration, or story..."
-                        className="min-h-[100px] border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20 resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="genre"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Genre</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Select genre" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Electronic">Electronic</SelectItem>
-                          <SelectItem value="Hip Hop">Hip Hop</SelectItem>
-                          <SelectItem value="Rock">Rock</SelectItem>
-                          <SelectItem value="Pop">Pop</SelectItem>
-                          <SelectItem value="Jazz">Jazz</SelectItem>
-                          <SelectItem value="Classical">Classical</SelectItem>
-                          <SelectItem value="Country">Country</SelectItem>
-                          <SelectItem value="R&B">R&B</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="owners"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Additional Owners (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="0x123..., 0x456..."
-                          {...field}
-                          className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20 font-mono text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Comma-separated wallet addresses
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Submit Section */}
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Badge variant="outline" className="text-xs">
-                Zora Protocol
-              </Badge>
-              <span>•</span>
-              <span>Base Network</span>
-              <span>•</span>
-              <span>IPFS Storage</span>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-              disabled={isUploading}
-            >
-              {isUploading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin size-5" viewBox="0 0 24 24">
-                    <title>Loading</title>
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8z"
-                    />
-                  </svg>
-                  Creating Song Coin...
-                </span>
-              ) : authenticated ? (
-                "Create Song Coin"
-              ) : (
-                "Sign In to Create"
-              )}
-            </Button>
+    <div className="w-full max-w-md mx-auto py-12 px-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Audio Upload */}
+        <div>
+          <div className="text-sm font-medium mb-2">Audio File</div>
+          <FileUpload
+            onFileSelect={handleAudioSelect}
+            acceptedTypes="audio/mp3,audio/wav"
+            label="Upload Audio"
+            icon={Music}
+            preview={
+              audioFile && audioPreview
+                ? { file: audioFile, url: audioPreview }
+                : undefined
+            }
+            onRemove={removeAudio}
+          />
+          <div className="text-xs text-muted-foreground mt-2">
+            Supported: mp3, wav. Max 5MB.
           </div>
-        </form>
-      </Form>
+        </div>
+        {/* Image Upload */}
+        <div>
+          <div className="text-sm font-medium mb-2">Cover Image</div>
+          <FileUpload
+            onFileSelect={handleImageSelect}
+            acceptedTypes="image/jpeg,image/png,image/gif"
+            label="Upload Cover"
+            icon={ImageIcon}
+            preview={
+              coverImage && imagePreview
+                ? { file: coverImage, url: imagePreview }
+                : undefined
+            }
+            onRemove={removeImage}
+          />
+          <div className="text-xs text-muted-foreground mt-2">
+            Supported: jpg, png, gif. Max 2MB.
+          </div>
+        </div>
+        {/* Song Title */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Song Title</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter song title"
+                  {...field}
+                  className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* Coin Symbol */}
+        <FormField
+          control={form.control}
+          name="symbol"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Coin Symbol</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g., YSNG"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20 font-mono"
+                />
+              </FormControl>
+              <FormMessage />
+              <div className="text-xs text-muted-foreground mt-1">
+                Max 11 characters, uppercase letters and numbers only
+              </div>
+            </FormItem>
+          )}
+        />
+        {/* Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe your song, inspiration, or story..."
+                  className="min-h-[100px] border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20 resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* Genre */}
+        <FormField
+          control={form.control}
+          name="genre"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Genre</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="border-0 bg-muted/50 focus:bg-muted focus:ring-2 focus:ring-primary/20">
+                    <SelectValue placeholder="Select genre" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Electronic">Electronic</SelectItem>
+                  <SelectItem value="Hip Hop">Hip Hop</SelectItem>
+                  <SelectItem value="Rock">Rock</SelectItem>
+                  <SelectItem value="Pop">Pop</SelectItem>
+                  <SelectItem value="Jazz">Jazz</SelectItem>
+                  <SelectItem value="Classical">Classical</SelectItem>
+                  <SelectItem value="Country">Country</SelectItem>
+                  <SelectItem value="R&B">R&B</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* Create Button */}
+        <Button
+          type="submit"
+          className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin size-5" viewBox="0 0 24 24">
+                <title>Loading</title>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
+              </svg>
+              Creating Song Coin...
+            </span>
+          ) : (
+            "Create Song Coin"
+          )}
+        </Button>
+      </form>
     </div>
   );
 }
