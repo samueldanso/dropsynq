@@ -185,10 +185,14 @@ function AudioPreview({ url }: { url: string }) {
     <button
       type="button"
       onClick={togglePlay}
-      className="size-10 bg-primary text-black rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors"
+      className="size-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors"
       aria-label={isPlaying ? "Pause audio" : "Play audio"}
     >
-      {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+      {isPlaying ? (
+        <Pause className="size-4 text-black" />
+      ) : (
+        <Play className="size-4 text-black" />
+      )}
     </button>
   );
 }

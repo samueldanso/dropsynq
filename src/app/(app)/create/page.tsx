@@ -4,7 +4,7 @@ import CreateForm from "./_components/create-form";
 
 export default function CreatePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         <div className="mx-auto max-w-4xl">
           {/* Header Section */}
