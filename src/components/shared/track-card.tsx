@@ -4,6 +4,7 @@ import type { GetCoinResponse } from "@zoralabs/coins-sdk";
 import { Heart, MessageCircle, Play, Share2, Users } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLikeCount } from "@/hooks/use-social";
 import BuyCoinButton from "./buy-coin-button";
 import { LikeButton } from "./like-button";
@@ -103,25 +104,22 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 	};
 
 	return (
-		<button
-			type="button"
-			className="group relative w-56 cursor-pointer rounded-xl bg-muted/60 shadow-sm hover:shadow-lg transition overflow-hidden text-left"
-			onClick={handleCardClick}
-		>
+		<div className="group relative w-64 cursor-pointer rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-border hover:bg-card/80 transition-all duration-300 overflow-hidden">
 			{/* Cover Image + Play Overlay */}
-			<div className="relative aspect-square w-full bg-gradient-to-br from-purple-500 to-pink-500">
+			<div className="relative aspect-square w-full bg-gradient-to-br from-slate-900 to-slate-800">
 				{coin.mediaContent?.previewImage?.medium ? (
 					<Image
 						src={coin.mediaContent.previewImage.medium}
 						alt={coin.name}
 						fill
-						className="object-cover"
+						className="object-cover transition-transform duration-300 group-hover:scale-105"
 					/>
 				) : (
 					<div className="flex h-full w-full items-center justify-center">
-						<Play className="size-12 text-white opacity-50" />
+						<Play className="size-16 text-white/30" />
 					</div>
 				)}
+
 				{/* Play Icon Overlay */}
 				<button
 					type="button"
@@ -129,56 +127,77 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 						e.stopPropagation();
 						onPlay?.(coin);
 					}}
-					className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition"
+					className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300"
 					aria-label="Play preview"
 				>
-					<Play className="size-10 text-white drop-shadow-lg" />
+					<div className="flex items-center justify-center size-14 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+						<Play className="size-6 text-white ml-1" />
+					</div>
 				</button>
+
 				{/* Symbol Badge */}
-				<div className="absolute top-2 right-2">
-					<span className="rounded bg-white/90 px-2 py-1 text-xs font-semibold text-black shadow">
+				<div className="absolute top-3 right-3">
+					<span className="rounded-full bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white border border-white/20">
 						{coin.symbol}
 					</span>
 				</div>
+
+				{/* Gradient Overlay */}
+				<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 			</div>
 
 			{/* Info Section */}
-			<div className="p-4 space-y-2">
-				<div className="flex items-center gap-2">
-					<span className="font-bold text-base line-clamp-1">{coin.name}</span>
-				</div>
-				<div className="flex items-center gap-2 text-sm text-muted-foreground">
-					{coin.creatorProfile?.avatar?.previewImage?.medium && (
-						<Image
-							src={coin.creatorProfile.avatar.previewImage.medium}
-							alt={coin.creatorProfile.handle || "creator avatar"}
-							width={20}
-							height={20}
-							className="rounded-full"
-						/>
-					)}
-					<span>@{coin.creatorProfile?.handle || "Unknown"}</span>
-				</div>
-				<div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
-					<div className="flex items-center gap-1">
-						<Users className="size-4" />
-						<span>{coin.uniqueHolders}</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<MessageCircle className="size-4" />
-						<span>{coin.zoraComments?.count ?? 0}</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Heart className="size-4" />
-						<span>{likeCount}</span>
+			<div className="p-5 space-y-3">
+				{/* Title and Artist */}
+				<div className="space-y-1">
+					<h3 className="font-semibold text-base text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+						{coin.name}
+					</h3>
+					<div className="flex items-center gap-2">
+						{coin.creatorProfile?.avatar?.previewImage?.medium && (
+							<Image
+								src={coin.creatorProfile.avatar.previewImage.medium}
+								alt={coin.creatorProfile.handle || "creator avatar"}
+								width={16}
+								height={16}
+								className="rounded-full"
+							/>
+						)}
+						<span className="text-sm text-muted-foreground">
+							{coin.creatorProfile?.handle || "Unknown Artist"}
+						</span>
 					</div>
 				</div>
-				<div className="flex items-center gap-2 mt-3">
-					<BuyCoinButton coinAddress={coin.address} amount="0.01" />
+
+				{/* Stats Row */}
+				<div className="flex items-center justify-between text-xs text-muted-foreground">
+					<div className="flex items-center gap-3">
+						<div className="flex items-center gap-1">
+							<Users className="size-3" />
+							<span>{coin.uniqueHolders}</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<MessageCircle className="size-3" />
+							<span>{coin.zoraComments?.count ?? 0}</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<Heart className="size-3" />
+							<span>{likeCount}</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Action Buttons */}
+				<div className="flex items-center gap-2 pt-2">
+					<BuyCoinButton
+						coinAddress={coin.address}
+						amount="0.01"
+						className="flex-1 h-9 text-sm"
+					/>
 					<LikeButton
 						coinAddress={coin.address}
 						showCount={false}
-						className="flex-1 justify-start"
+						className="size-9 rounded-full"
 					/>
 					<button
 						type="button"
@@ -193,16 +212,54 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 								navigator.clipboard.writeText(
 									window.location.origin + "/track/" + coin.address,
 								);
-								// Optionally show a toast
 							}
 						}}
-						className="rounded-full p-2 hover:bg-accent transition"
+						className="size-9 rounded-full bg-muted hover:bg-accent transition-colors flex items-center justify-center"
 						aria-label="Share"
 					>
 						<Share2 className="size-4" />
 					</button>
 				</div>
 			</div>
-		</button>
+		</div>
+	);
+}
+
+// Skeleton component for loading state
+export function TrackCardSkeleton() {
+	return (
+		<div className="relative w-64 rounded-2xl bg-card/50 border border-border/50 overflow-hidden">
+			{/* Cover Image Skeleton */}
+			<div className="relative aspect-square w-full bg-gradient-to-br from-slate-900 to-slate-800">
+				<Skeleton className="absolute inset-0" />
+				{/* Symbol Badge Skeleton */}
+				<div className="absolute top-3 right-3">
+					<Skeleton className="h-6 w-12 rounded-full" />
+				</div>
+			</div>
+
+			{/* Info Section Skeleton */}
+			<div className="p-5 space-y-3">
+				<div className="space-y-1">
+					<Skeleton className="h-5 w-40" />
+					<div className="flex items-center gap-2">
+						<Skeleton className="size-4 rounded-full" />
+						<Skeleton className="h-4 w-24" />
+					</div>
+				</div>
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<Skeleton className="h-3 w-8" />
+						<Skeleton className="h-3 w-8" />
+						<Skeleton className="h-3 w-8" />
+					</div>
+				</div>
+				<div className="flex items-center gap-2 pt-2">
+					<Skeleton className="h-9 flex-1" />
+					<Skeleton className="size-9 rounded-full" />
+					<Skeleton className="size-9 rounded-full" />
+				</div>
+			</div>
+		</div>
 	);
 }
