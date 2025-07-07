@@ -172,13 +172,13 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 				</div>
 			</div>
 			{/* Content */}
-			<div className="flex-1 px-3 py-2 flex flex-col gap-2 justify-between bg-transparent">
+			<div className="flex-1 px-3 py-2 flex flex-col gap-2 justify-between bg-transparent rounded-b-xl">
 				{/* Title */}
 				<h3 className="font-bold text-base text-foreground line-clamp-1 text-left group-hover:text-primary transition-colors">
 					{coin.name}
 				</h3>
 				{/* Artist */}
-				<div className="flex items-center gap-2 text-xs text-muted-foreground">
+				<div className="flex items-center gap-2 text-sm text-muted-foreground">
 					{coin.creatorProfile?.avatar?.previewImage?.medium && (
 						<Image
 							src={coin.creatorProfile.avatar.previewImage.medium}
@@ -190,7 +190,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					)}
 					<button
 						type="button"
-						className="hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none text-xs"
+						className="hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none text-sm"
 						onClick={handleArtistClick}
 						onKeyUp={(e) => {
 							if (e.key === "Enter" || e.key === " ")
@@ -203,7 +203,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					</button>
 				</div>
 				{/* Stats Row */}
-				<div className="flex items-center gap-4 text-xs mt-1">
+				<div className="flex items-center gap-4 text-sm mt-1">
 					<div className="flex items-center gap-1">
 						<DollarSign className="size-4 text-green-500" />
 						<span className="font-semibold text-green-500">

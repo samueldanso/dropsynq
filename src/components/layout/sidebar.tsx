@@ -16,182 +16,182 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
 export function AppSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const pathname = usePathname();
-  const { ready, authenticated, user, login } = usePrivy();
+	const [collapsed, setCollapsed] = useState(false);
+	const pathname = usePathname();
+	const { ready, authenticated, user, login } = usePrivy();
 
-  // Fetch Zora profile for handle (if authenticated)
-  const { data: zoraProfile } = useQuery({
-    queryKey: ["zora-profile", user?.wallet?.address],
-    queryFn: async () => {
-      if (!user?.wallet?.address) return null;
-      const res = await getProfile({ identifier: user.wallet.address });
-      return res?.data?.profile;
-    },
-    enabled: !!user?.wallet?.address,
-  });
+	// Fetch Zora profile for handle (if authenticated)
+	const { data: zoraProfile } = useQuery({
+		queryKey: ["zora-profile", user?.wallet?.address],
+		queryFn: async () => {
+			if (!user?.wallet?.address) return null;
+			const res = await getProfile({ identifier: user.wallet.address });
+			return res?.data?.profile;
+		},
+		enabled: !!user?.wallet?.address,
+	});
 
-  const profileHref =
-    ready && authenticated && user?.wallet
-      ? zoraProfile?.handle
-        ? `/profile/${zoraProfile.handle}`
-        : `/profile/${user.wallet.address}`
-      : "/";
+	const profileHref =
+		ready && authenticated && user?.wallet
+			? zoraProfile?.handle
+				? `/profile/${zoraProfile.handle}`
+				: `/profile/${user.wallet.address}`
+			: "/";
 
-  const navLinks = [
-    {
-      href: "/",
-      label: "Home",
-      icon: HomeIcon,
-      iconFill: HomeFillIcon,
-      isActive: () => pathname === "/",
-    },
-    {
-      href: "/library",
-      label: "Library",
-      icon: Library,
-      iconFill: Library,
-      isActive: () => pathname.startsWith("/library"),
-    },
-    {
-      href: profileHref,
-      label: "Profile",
-      icon: PersonIcon,
-      iconFill: PersonFillIcon,
-      isActive: () => pathname.startsWith("/profile"),
-    },
-  ];
+	const navLinks = [
+		{
+			href: "/",
+			label: "Home",
+			icon: HomeIcon,
+			iconFill: HomeFillIcon,
+			isActive: () => pathname === "/",
+		},
+		{
+			href: "/library",
+			label: "Library",
+			icon: Library,
+			iconFill: Library,
+			isActive: () => pathname.startsWith("/library"),
+		},
+		{
+			href: profileHref,
+			label: "Profile",
+			icon: PersonIcon,
+			iconFill: PersonFillIcon,
+			isActive: () => pathname.startsWith("/profile"),
+		},
+	];
 
-  if (collapsed) {
-    return (
-      <div
-        className={cn(
-          // Minimal floating card style for sidebar
-          "flex h-full flex-col transition-all duration-200",
-          "w-16 pl-2",
-          "bg-card rounded-2xl shadow-lg", // Remove border
-          "mt-1 ml-1 mb-1" // Only 4px (mt-1) at top and bottom
-        )}
-      >
-        {/* Top: Icon only */}
-        <div className="flex h-16 items-center justify-center">
-          <Image src="/icon.svg" alt="Logo" width={32} height={32} priority />
-        </div>
-        {/* Center: Main Nav */}
-        <nav className="flex flex-col items-center gap-2 mt-6 w-full">
-          {/* Toggle button as first nav item */}
-          <button
-            type="button"
-            aria-label="Expand sidebar"
-            onClick={() => setCollapsed(false)}
-            className="flex justify-center items-center w-10 h-10 rounded-full hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring mb-2 transition-colors"
-          >
-            <PanelLeftOpen className="h-5 w-5" />
-          </button>
-          {navLinks.map((link) => {
-            const isActive = link.isActive();
-            const IconComponent = link.iconFill
-              ? isActive
-                ? link.iconFill
-                : link.icon
-              : link.icon;
-            const isProtected =
-              link.label === "Profile" || link.label === "Library";
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center justify-center w-full"
-                onClick={
-                  isProtected && !authenticated
-                    ? (e) => {
-                        e.preventDefault();
-                        login();
-                      }
-                    : undefined
-                }
-              >
-                <span
-                  className={cn(
-                    "flex items-center justify-center w-10 h-10 rounded-full transition-colors",
-                    isProtected && !authenticated
-                      ? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                      : isActive
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                  )}
-                >
-                  <IconComponent className="h-5 w-5 mx-auto" />
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    );
-  }
+	if (collapsed) {
+		return (
+			<div
+				className={cn(
+					// Minimal floating card style for sidebar
+					"flex h-full flex-col transition-all duration-200",
+					"w-16 pl-2",
+					"bg-card rounded-2xl shadow-lg", // Remove border
+					"mt-1 ml-1 mb-1", // Only 4px (mt-1) at top and bottom
+				)}
+			>
+				{/* Top: Icon only */}
+				<div className="flex h-16 items-center justify-center">
+					<Image src="/icon.svg" alt="Logo" width={32} height={32} priority />
+				</div>
+				{/* Center: Main Nav */}
+				<nav className="flex flex-col items-center gap-2 mt-6 w-full">
+					{/* Toggle button as first nav item */}
+					<button
+						type="button"
+						aria-label="Expand sidebar"
+						onClick={() => setCollapsed(false)}
+						className="flex justify-center items-center w-10 h-10 rounded-full hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring mb-2 transition-colors"
+					>
+						<PanelLeftOpen className="h-5 w-5" />
+					</button>
+					{navLinks.map((link) => {
+						const isActive = link.isActive();
+						const IconComponent = link.iconFill
+							? isActive
+								? link.iconFill
+								: link.icon
+							: link.icon;
+						const isProtected =
+							link.label === "Profile" || link.label === "Library";
+						return (
+							<Link
+								key={link.href}
+								href={link.href}
+								className="flex items-center justify-center w-full"
+								onClick={
+									isProtected && !authenticated
+										? (e) => {
+												e.preventDefault();
+												login();
+											}
+										: undefined
+								}
+							>
+								<span
+									className={cn(
+										"flex items-center justify-center w-10 h-10 rounded-full transition-colors",
+										isProtected && !authenticated
+											? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+											: isActive
+												? "bg-muted text-foreground"
+												: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+									)}
+								>
+									<IconComponent className="h-5 w-5 mx-auto" />
+								</span>
+							</Link>
+						);
+					})}
+				</nav>
+			</div>
+		);
+	}
 
-  // Expanded: logo and toggle at top, centered nav
-  return (
-    <div
-      className={cn(
-        // Minimal floating card style for sidebar
-        "flex h-full flex-col transition-all duration-200",
-        "w-64 pl-2",
-        "bg-card rounded-2xl shadow-lg", // Remove border
-        "mt-1 ml-1 mb-1" // Only 4px (mt-1) at top and bottom
-      )}
-    >
-      {/* Top: Logo */}
-      <div className="flex h-16 items-center px-2 gap-2">
-        <Logo variant="sidebar" />
-        <button
-          type="button"
-          aria-label="Collapse sidebar"
-          onClick={() => setCollapsed(true)}
-          className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <PanelLeftOpen className="h-5 w-5 transform rotate-180" />
-        </button>
-      </div>
-      {/* Center: Main Nav */}
-      <nav className="flex flex-col gap-2 mt-6">
-        {navLinks.map((link) => {
-          const isActive = link.isActive();
-          const IconComponent = link.iconFill
-            ? isActive
-              ? link.iconFill
-              : link.icon
-            : link.icon;
-          const isProtected =
-            link.label === "Profile" || link.label === "Library";
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-2 py-3 font-medium transition-colors",
-                isProtected && !authenticated
-                  ? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                  : isActive
-                  ? "text-foreground font-semibold"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-              onClick={
-                isProtected && !authenticated
-                  ? (e) => {
-                      e.preventDefault();
-                      login();
-                    }
-                  : undefined
-              }
-            >
-              <IconComponent className="h-5 w-5" />
-              <span>{link.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-    </div>
-  );
+	// Expanded: logo and toggle at top, centered nav
+	return (
+		<div
+			className={cn(
+				// Minimal floating card style for sidebar
+				"flex h-full flex-col transition-all duration-200",
+				"w-64 pl-2",
+				"bg-card rounded-2xl shadow-lg", // Remove border
+				"mt-1 ml-1 mb-1", // Only 4px (mt-1) at top and bottom
+			)}
+		>
+			{/* Top: Logo */}
+			<div className="flex h-16 items-center px-2 gap-2">
+				<Logo variant="sidebar" />
+				<button
+					type="button"
+					aria-label="Collapse sidebar"
+					onClick={() => setCollapsed(true)}
+					className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
+				>
+					<PanelLeftOpen className="h-5 w-5 transform rotate-180" />
+				</button>
+			</div>
+			{/* Center: Main Nav */}
+			<nav className="flex flex-col gap-2 mt-6">
+				{navLinks.map((link) => {
+					const isActive = link.isActive();
+					const IconComponent = link.iconFill
+						? isActive
+							? link.iconFill
+							: link.icon
+						: link.icon;
+					const isProtected =
+						link.label === "Profile" || link.label === "Library";
+					return (
+						<Link
+							key={link.href}
+							href={link.href}
+							className={cn(
+								"flex items-center gap-3 rounded-lg px-2 py-3 font-medium transition-colors",
+								isProtected && !authenticated
+									? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+									: isActive
+										? "text-foreground font-semibold"
+										: "text-muted-foreground hover:bg-muted hover:text-foreground",
+							)}
+							onClick={
+								isProtected && !authenticated
+									? (e) => {
+											e.preventDefault();
+											login();
+										}
+									: undefined
+							}
+						>
+							<IconComponent className="h-5 w-5" />
+							<span>{link.label}</span>
+						</Link>
+					);
+				})}
+			</nav>
+		</div>
+	);
 }
