@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${manrope.variable} antialiased`}>
+			<body className={`${manrope.variable} antialiased overflow-x-hidden`}>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"

@@ -84,7 +84,7 @@ export default function AppHomePage() {
 						<HorizontalScroller>
 							{loadingNew
 								? generateSkeletonKeys(6, "skeleton-new").map((key) => (
-										<div key={key} className="w-64 flex-shrink-0" />
+										<div key={key} className="w-[300px] flex-shrink-0" />
 									))
 								: newestCoins.map((coin) => (
 										<TrackCard
@@ -109,7 +109,7 @@ export default function AppHomePage() {
 						<HorizontalScroller>
 							{loadingGainers
 								? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
-										<div key={key} className="w-64 flex-shrink-0" />
+										<div key={key} className="w-[300px] flex-shrink-0" />
 									))
 								: topGainers.map((coin) => (
 										<TrackCard
@@ -134,7 +134,7 @@ export default function AppHomePage() {
 						<HorizontalScroller>
 							{loadingTrending
 								? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
-										<div key={key} className="w-64 flex-shrink-0" />
+										<div key={key} className="w-[300px] flex-shrink-0" />
 									))
 								: trendingCoins.map((coin) => (
 										<TrackCard
