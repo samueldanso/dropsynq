@@ -66,11 +66,11 @@ export function AppSidebar() {
 		return (
 			<div
 				className={cn(
-					// Floating card style for collapsed sidebar
+					// Minimal floating card style for sidebar
 					"flex h-full flex-col transition-all duration-200",
-					"w-16 pl-4",
-					"bg-card rounded-2xl shadow-lg border",
-					"my-4 ml-4", // margin to float from top/left
+					"w-16 pl-2",
+					"bg-card rounded-2xl shadow-lg", // Remove border
+					"my-4 ml-1", // Push closer to left, only 4px (ml-1)
 				)}
 			>
 				{/* Top: Icon only */}
@@ -135,11 +135,11 @@ export function AppSidebar() {
 	return (
 		<div
 			className={cn(
-				// Floating card style for desktop sidebar
+				// Minimal floating card style for sidebar
 				"flex h-full flex-col transition-all duration-200",
-				"w-64 pl-4",
-				"bg-card rounded-2xl shadow-lg border",
-				"my-4 ml-4", // margin to float from top/left
+				"w-64 pl-2",
+				"bg-card rounded-2xl shadow-lg", // Remove border
+				"my-4 ml-1", // Push closer to left, only 4px (ml-1)
 			)}
 		>
 			{/* Top: Logo */}

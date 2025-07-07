@@ -60,7 +60,7 @@ export default function AppHomePage() {
 			</div>
 
 			{/* Main Content */}
-			<div className="container mx-auto px-4 py-8">
+			<div className="container mx-auto px-4 py-8 flex flex-col items-start">
 				{/* Genre Filter */}
 				<div className="mb-12">
 					<GenreFilter
@@ -78,7 +78,7 @@ export default function AppHomePage() {
 								Latest Releases
 							</h2>
 						</div>
-						<HorizontalScroller>
+						<HorizontalScroller cardsToShow={4}>
 							{loadingNew
 								? generateSkeletonKeys(6, "skeleton-new").map((key) => (
 										<div key={key} className="w-[300px] flex-shrink-0" />
@@ -100,7 +100,7 @@ export default function AppHomePage() {
 								Trending Now
 							</h2>
 						</div>
-						<HorizontalScroller>
+						<HorizontalScroller cardsToShow={4}>
 							{loadingGainers
 								? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
 										<div key={key} className="w-[300px] flex-shrink-0" />
@@ -122,7 +122,7 @@ export default function AppHomePage() {
 								Top Charts
 							</h2>
 						</div>
-						<HorizontalScroller>
+						<HorizontalScroller cardsToShow={4}>
 							{loadingTrending
 								? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
 										<div key={key} className="w-[300px] flex-shrink-0" />

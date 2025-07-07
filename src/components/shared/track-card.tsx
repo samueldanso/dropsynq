@@ -136,7 +136,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 			aria-label={`View details for ${coin.name}`}
 		>
 			{/* Header: Cover + Play */}
-			<div className="relative w-full h-[170px] bg-gradient-to-br from-slate-900 to-slate-800">
+			<div className="relative w-full h-[190px] rounded-t-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
 				{coin.mediaContent?.previewImage?.medium ? (
 					<Image
 						src={coin.mediaContent.previewImage.medium}
@@ -147,7 +147,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					/>
 				) : (
 					<div className="flex h-full w-full items-center justify-center">
-						<Play className="size-12 text-white/30" />
+						<Play className="size-14 text-white/30" />
 					</div>
 				)}
 				{/* Play Overlay */}
@@ -160,8 +160,8 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300"
 					aria-label="Play preview"
 				>
-					<div className="flex items-center justify-center size-12 bg-white/20 backdrop-blur-sm rounded-full">
-						<Play className="size-6 text-white ml-1" />
+					<div className="flex items-center justify-center size-16 bg-white/30 backdrop-blur-sm rounded-full shadow-lg">
+						<Play className="size-7 text-white ml-1" />
 					</div>
 				</button>
 				{/* Symbol Badge */}
@@ -244,11 +244,11 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 				<div className="mt-2">
 					<button
 						type="button"
-						className="w-full py-1 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition"
+						className="w-full py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition"
 						onClick={(e) => {
 							e.stopPropagation();
 							if (!authenticated) login();
-							else router.push(`/track/${coin.address}`); // or trigger buy modal/flow
+							else router.push(`/track/${coin.address}`);
 						}}
 					>
 						Buy

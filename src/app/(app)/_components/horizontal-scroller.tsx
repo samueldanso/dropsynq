@@ -33,35 +33,38 @@ export function HorizontalScroller({
 	const visibleCards = allCards.slice(startIndex, startIndex + cardsToShow);
 
 	return (
-		<div className="relative w-full flex justify-center overflow-x-hidden">
-			<div className="relative flex items-center w-full max-w-full">
-				<button
-					type="button"
-					className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-card/80 rounded-full shadow p-2 border border-border hover:bg-accent transition-all"
-					onClick={scrollLeft}
-					aria-label="Scroll left"
-					disabled={startIndex === 0}
-				>
-					<ChevronLeft className="size-6" />
-				</button>
-				<div className="flex gap-3 w-full justify-center items-stretch">
-					{visibleCards.map((card, idx) =>
-						cloneElement(card as any, {
-							key: card.key ?? idx,
-							style: { width: 220, minWidth: 220, maxWidth: 220 },
-						}),
-					)}
-				</div>
-				<button
-					type="button"
-					className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-card/80 rounded-full shadow p-2 border border-border hover:bg-accent transition-all"
-					onClick={scrollRight}
-					aria-label="Scroll right"
-					disabled={startIndex === maxStart}
-				>
-					<ChevronRight className="size-6" />
-				</button>
+		<div className="relative w-full flex items-center justify-start gap-3">
+			{/* Left Arrow */}
+			<button
+				type="button"
+				className="z-10 bg-card/80 rounded-full shadow p-2 border border-border hover:bg-accent transition-all disabled:opacity-40"
+				onClick={scrollLeft}
+				aria-label="Scroll left"
+				disabled={startIndex === 0}
+				style={{ marginRight: 8 }}
+			>
+				<ChevronLeft className="size-6" />
+			</button>
+			{/* Cards Row */}
+			<div className="flex gap-3 w-full justify-start items-stretch">
+				{visibleCards.map((card, idx) =>
+					cloneElement(card as any, {
+						key: card.key ?? idx,
+						style: { width: 220, minWidth: 220, maxWidth: 220 },
+					}),
+				)}
 			</div>
+			{/* Right Arrow */}
+			<button
+				type="button"
+				className="z-10 bg-card/80 rounded-full shadow p-2 border border-border hover:bg-accent transition-all disabled:opacity-40"
+				onClick={scrollRight}
+				aria-label="Scroll right"
+				disabled={startIndex === maxStart}
+				style={{ marginLeft: 8 }}
+			>
+				<ChevronRight className="size-6" />
+			</button>
 		</div>
 	);
 }
