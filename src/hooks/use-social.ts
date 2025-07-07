@@ -61,6 +61,9 @@ export function useSongSocial({
 			queryClient.invalidateQueries({
 				queryKey: ["song-like", coinAddress, userAddress],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["like-count", coinAddress],
+			});
 		},
 		onError: (error) => {
 			toast.error(error.message || "Failed to like song");
@@ -83,6 +86,9 @@ export function useSongSocial({
 			toast.success("Song unliked!");
 			queryClient.invalidateQueries({
 				queryKey: ["song-like", coinAddress, userAddress],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["like-count", coinAddress],
 			});
 		},
 		onError: (error) => {
@@ -140,6 +146,32 @@ export function useSongSocial({
 		isCommentsLoading,
 		addComment: addCommentMutation.mutate,
 		isAddingComment: addCommentMutation.isPending,
+	};
+}
+
+// Like count hook
+interface UseLikeCountProps {
+	coinAddress: string;
+}
+
+export function useLikeCount({ coinAddress }: UseLikeCountProps) {
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["like-count", coinAddress],
+		queryFn: async () => {
+			const response = await fetch(`/api/songs/${coinAddress}/likes`);
+			if (!response.ok) {
+				throw new Error("Failed to fetch like count");
+			}
+			const data = await response.json();
+			return data.data?.count || 0;
+		},
+		enabled: !!coinAddress,
+	});
+
+	return {
+		likeCount: data || 0,
+		isLoading,
+		error,
 	};
 }
 
@@ -262,6 +294,10 @@ export function useFollowSocial({ followeeAddress }: UseFollowSocialProps) {
 			queryClient.invalidateQueries({
 				queryKey: ["following", followeeAddress],
 			});
+			// Invalidate follow counts for both users
+			queryClient.invalidateQueries({
+				queryKey: ["follow-counts"],
+			});
 		},
 		onError: (error) => {
 			toast.error(error.message || "Failed to follow/unfollow");
@@ -283,5 +319,32 @@ export function useFollowSocial({ followeeAddress }: UseFollowSocialProps) {
 		// Following list data
 		following: following || [],
 		isFollowingListLoading,
+	};
+}
+
+// Follow counts hook
+interface UseFollowCountsProps {
+	handle: string;
+}
+
+export function useFollowCounts({ handle }: UseFollowCountsProps) {
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["follow-counts", handle],
+		queryFn: async () => {
+			const response = await fetch(`/api/profile/${handle}/follow-count`);
+			if (!response.ok) {
+				throw new Error("Failed to fetch follow counts");
+			}
+			const data = await response.json();
+			return data.data;
+		},
+		enabled: !!handle,
+	});
+
+	return {
+		followers: data?.followers || 0,
+		following: data?.following || 0,
+		isLoading,
+		error,
 	};
 }

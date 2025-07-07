@@ -3,29 +3,53 @@
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useFollowSocial } from "@/hooks/use-social";
+import { cn } from "@/lib/utils";
 
 interface FollowButtonProps {
 	userId: string;
+	className?: string;
+	showText?: boolean;
 }
 
-export function FollowButton({ userId }: FollowButtonProps) {
+export function FollowButton({
+	userId,
+	className,
+	showText = true,
+}: FollowButtonProps) {
 	const { address } = useAccount();
-	const follow = useFollowSocial({ followeeAddress: userId });
+	const { isFollowing, toggleFollow, isFollowLoading } = useFollowSocial({
+		followeeAddress: userId,
+	});
 
 	const handleFollow = () => {
-		follow.toggleFollow();
+		if (!address) {
+			// Could show a toast here asking user to connect wallet
+			return;
+		}
+		toggleFollow();
 	};
-
-	const isLoading = follow.isFollowLoading;
 
 	return (
 		<Button
 			onClick={handleFollow}
-			disabled={isLoading || !address}
-			variant="default"
-			className="rounded-full px-8"
+			disabled={isFollowLoading || !address}
+			variant={isFollowing ? "outline" : "default"}
+			size="sm"
+			className={cn(
+				"rounded-full transition-all",
+				isFollowing && "hover:bg-destructive hover:text-destructive-foreground",
+				className,
+			)}
 		>
-			{isLoading ? "..." : "Follow"}
+			{isFollowLoading
+				? "..."
+				: isFollowing
+					? showText
+						? "Unfollow"
+						: "✓"
+					: showText
+						? "Follow"
+						: "+"}
 		</Button>
 	);
 }

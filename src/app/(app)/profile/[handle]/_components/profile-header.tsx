@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import { FollowButton } from "@/components/shared/follow-button";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFollowCounts } from "@/hooks/use-social";
 import type { ZoraProfile } from "@/types/zora";
 
 type CoinBalanceNode = NonNullable<
@@ -18,6 +19,10 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile, balances }: ProfileHeaderProps) {
 	const { address: connectedAddress } = useAccount();
+	const { followers: followersCount, following: followingCount } =
+		useFollowCounts({
+			handle: profile.handle || profile.publicWallet?.walletAddress || "",
+		});
 
 	if (!profile) return <div>User not found.</div>;
 
@@ -28,8 +33,6 @@ export function ProfileHeader({ profile, balances }: ProfileHeaderProps) {
 			profile.publicWallet.walletAddress.toLowerCase();
 	const displayName = profile.displayName || "Anonymous";
 	const dropsCount = balances?.length || 0;
-	const followingCount = 0;
-	const followersCount = 0;
 
 	return (
 		<div className="flex w-full flex-col items-center justify-center gap-6 pb-8">
