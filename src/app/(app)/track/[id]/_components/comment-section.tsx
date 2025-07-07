@@ -28,7 +28,7 @@ interface ZoraCommentNode {
 			};
 		};
 	};
-	replies: {
+	replies?: {
 		count: number;
 		edges: Array<{
 			node: ZoraCommentNode;
@@ -130,7 +130,7 @@ export default function CommentSection({ coinAddress }: CommentSectionProps) {
 									<p className="text-sm text-foreground">{comment.comment}</p>
 
 									{/* Show reply count if there are replies */}
-									{comment.replies.count > 0 && (
+									{comment.replies && comment.replies.count > 0 && (
 										<div className="flex items-center gap-4 mt-2">
 											<div className="flex items-center gap-1 text-xs text-muted-foreground">
 												<span>{comment.replies.count} replies</span>

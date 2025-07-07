@@ -189,11 +189,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 
 				{/* Action Buttons */}
 				<div className="flex items-center gap-2 pt-2">
-					<BuyCoinButton
-						coinAddress={coin.address}
-						amount="0.01"
-						className="flex-1 h-9 text-sm"
-					/>
+					<BuyCoinButton coinAddress={coin.address} amount="0.01" />
 					<LikeButton
 						coinAddress={coin.address}
 						showCount={false}
