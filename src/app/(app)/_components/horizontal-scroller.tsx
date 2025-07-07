@@ -34,7 +34,7 @@ export function HorizontalScroller({
 
 	return (
 		<div className="relative w-full flex justify-center overflow-x-hidden">
-			<div className="relative flex items-center w-[1340px] max-w-full">
+			<div className="relative flex items-center w-full max-w-full">
 				<button
 					type="button"
 					className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-card/80 rounded-full shadow p-2 border border-border hover:bg-accent transition-all"
@@ -44,11 +44,11 @@ export function HorizontalScroller({
 				>
 					<ChevronLeft className="size-6" />
 				</button>
-				<div className="flex gap-6 w-full justify-center items-stretch">
+				<div className="flex gap-3 w-full justify-center items-stretch">
 					{visibleCards.map((card, idx) =>
 						cloneElement(card as any, {
 							key: card.key ?? idx,
-							style: { width: 320, minWidth: 320, maxWidth: 320 },
+							style: { width: 220, minWidth: 220, maxWidth: 220 },
 						}),
 					)}
 				</div>

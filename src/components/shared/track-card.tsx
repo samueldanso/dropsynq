@@ -1,13 +1,18 @@
 "use client";
 
 import type { GetCoinResponse } from "@zoralabs/coins-sdk";
-import { Heart, MessageCircle, Play, Share2, Users } from "lucide-react";
+import {
+	DollarSign,
+	Heart,
+	MessageCircle,
+	Play,
+	Share2,
+	Users,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLikeCount } from "@/hooks/use-social";
 import BuyCoinButton from "./buy-coin-button";
-import { LikeButton } from "./like-button";
 
 // Base coin type that works for both GetCoinResponse and explore responses
 type BaseCoin = {
@@ -92,7 +97,6 @@ interface TrackCardProps {
 
 export function TrackCard({ coin, onPlay }: TrackCardProps) {
 	const router = useRouter();
-	const { likeCount } = useLikeCount({ coinAddress: coin.address });
 
 	const handleCardClick = (e: React.MouseEvent) => {
 		// Prevent click if play icon or button is clicked
@@ -103,20 +107,49 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 		router.push(`/track/${coin.address}`);
 	};
 
+	function formatMarketCap(mcap: string) {
+		const num = Number(mcap);
+		if (isNaN(num)) return "-";
+		if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+		if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+		if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
+		return num.toString();
+	}
+
+	const handleArtistClick = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		const handle = coin.creatorProfile?.handle;
+		const address = coin.creatorAddress;
+		if (handle) {
+			router.push(`/profile/${handle}`);
+		} else if (address) {
+			router.push(`/profile/${address}`);
+		}
+	};
+
 	return (
-		<div className="group relative w-[300px] cursor-pointer rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-border hover:bg-card/80 transition-all duration-300 overflow-hidden">
+		<button
+			type="button"
+			className="group relative w-[220px] h-[260px] cursor-pointer rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-border hover:bg-card/80 transition-all duration-300 overflow-hidden flex flex-col"
+			onClick={handleCardClick}
+			onKeyUp={(e) => {
+				if (e.key === "Enter" || e.key === " ") handleCardClick(e as any);
+			}}
+			aria-label={`View details for ${coin.name}`}
+		>
 			{/* Cover Image + Play Overlay */}
-			<div className="relative aspect-square w-full bg-gradient-to-br from-slate-900 to-slate-800">
+			<div className="relative w-full h-[140px] bg-gradient-to-br from-slate-900 to-slate-800">
 				{coin.mediaContent?.previewImage?.medium ? (
 					<Image
 						src={coin.mediaContent.previewImage.medium}
 						alt={coin.name}
 						fill
 						className="object-cover transition-transform duration-300 group-hover:scale-105"
+						style={{ objectFit: "cover" }}
 					/>
 				) : (
 					<div className="flex h-full w-full items-center justify-center">
-						<Play className="size-16 text-white/30" />
+						<Play className="size-12 text-white/30" />
 					</div>
 				)}
 
@@ -130,14 +163,14 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300"
 					aria-label="Play preview"
 				>
-					<div className="flex items-center justify-center size-14 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-						<Play className="size-6 text-white ml-1" />
+					<div className="flex items-center justify-center size-10 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+						<Play className="size-5 text-white ml-1" />
 					</div>
 				</button>
 
 				{/* Symbol Badge */}
-				<div className="absolute top-3 right-3">
-					<span className="rounded-full bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white border border-white/20">
+				<div className="absolute top-2 right-2">
+					<span className="rounded-full bg-black/60 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium text-white border border-white/20">
 						{coin.symbol}
 					</span>
 				</div>
@@ -147,54 +180,55 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 			</div>
 
 			{/* Info Section */}
-			<div className="p-5 space-y-3">
+			<div className="flex-1 p-3 space-y-2 flex flex-col justify-between">
 				{/* Title and Artist */}
-				<div className="space-y-1">
-					<h3 className="font-semibold text-base text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+				<div className="space-y-0.5">
+					<h3 className="font-semibold text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
 						{coin.name}
 					</h3>
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-1">
 						{coin.creatorProfile?.avatar?.previewImage?.medium && (
 							<Image
 								src={coin.creatorProfile.avatar.previewImage.medium}
 								alt={coin.creatorProfile.handle || "creator avatar"}
-								width={16}
-								height={16}
+								width={14}
+								height={14}
 								className="rounded-full"
 							/>
 						)}
-						<span className="text-sm text-muted-foreground">
+						<button
+							type="button"
+							className="text-xs text-muted-foreground hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+							onClick={handleArtistClick}
+							onKeyUp={(e) => {
+								if (e.key === "Enter" || e.key === " ")
+									handleArtistClick(e as any);
+							}}
+							tabIndex={0}
+							aria-label="View artist profile"
+						>
 							{coin.creatorProfile?.handle || "Unknown Artist"}
-						</span>
+						</button>
 					</div>
 				</div>
 
 				{/* Stats Row */}
-				<div className="flex items-center justify-between text-xs text-muted-foreground">
-					<div className="flex items-center gap-3">
-						<div className="flex items-center gap-1">
+				<div className="flex items-center justify-between text-[10px] text-muted-foreground">
+					<div className="flex items-center gap-2">
+						<div className="flex items-center gap-0.5">
 							<Users className="size-3" />
 							<span>{coin.uniqueHolders}</span>
 						</div>
-						<div className="flex items-center gap-1">
-							<MessageCircle className="size-3" />
-							<span>{coin.zoraComments?.count ?? 0}</span>
-						</div>
-						<div className="flex items-center gap-1">
-							<Heart className="size-3" />
-							<span>{likeCount}</span>
+						<div className="flex items-center gap-0.5">
+							<DollarSign className="size-3" />
+							<span>{formatMarketCap(coin.marketCap)}</span>
 						</div>
 					</div>
 				</div>
 
 				{/* Action Buttons */}
-				<div className="flex items-center gap-2 pt-2">
+				<div className="flex items-center gap-1 pt-1">
 					<BuyCoinButton coinAddress={coin.address} amount="0.01" />
-					<LikeButton
-						coinAddress={coin.address}
-						showCount={false}
-						className="size-9 rounded-full"
-					/>
 					<button
 						type="button"
 						onClick={(e) => {
@@ -210,50 +244,36 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 								);
 							}
 						}}
-						className="size-9 rounded-full bg-muted hover:bg-accent transition-colors flex items-center justify-center"
+						className="size-7 rounded-full bg-muted hover:bg-accent transition-colors flex items-center justify-center"
 						aria-label="Share"
 					>
-						<Share2 className="size-4" />
+						<Share2 className="size-3" />
 					</button>
 				</div>
 			</div>
-		</div>
+		</button>
 	);
 }
 
 // Skeleton component for loading state
 export function TrackCardSkeleton() {
 	return (
-		<div className="relative w-[300px] rounded-2xl bg-card/50 border border-border/50 overflow-hidden">
-			{/* Cover Image Skeleton */}
-			<div className="relative aspect-square w-full bg-gradient-to-br from-slate-900 to-slate-800">
-				<Skeleton className="absolute inset-0" />
-				{/* Symbol Badge Skeleton */}
-				<div className="absolute top-3 right-3">
-					<Skeleton className="h-6 w-12 rounded-full" />
-				</div>
-			</div>
-
-			{/* Info Section Skeleton */}
-			<div className="p-5 space-y-3">
+		<div className="w-[220px] h-[260px] rounded-xl bg-muted/40 border border-border/30 flex flex-col overflow-hidden animate-pulse">
+			<div className="w-full h-[140px] bg-muted/60" />
+			<div className="flex-1 p-3 flex flex-col gap-2 justify-between">
 				<div className="space-y-1">
-					<Skeleton className="h-5 w-40" />
-					<div className="flex items-center gap-2">
-						<Skeleton className="size-4 rounded-full" />
-						<Skeleton className="h-4 w-24" />
-					</div>
+					<Skeleton className="h-4 w-3/4 rounded" />
+					<Skeleton className="h-3 w-1/2 rounded" />
 				</div>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-3">
-						<Skeleton className="h-3 w-8" />
-						<Skeleton className="h-3 w-8" />
-						<Skeleton className="h-3 w-8" />
-					</div>
+				<div className="flex items-center gap-2">
+					<Skeleton className="h-3 w-6 rounded" />
+					<Skeleton className="h-3 w-6 rounded" />
+					<Skeleton className="h-3 w-6 rounded" />
 				</div>
-				<div className="flex items-center gap-2 pt-2">
-					<Skeleton className="h-9 flex-1" />
-					<Skeleton className="size-9 rounded-full" />
-					<Skeleton className="size-9 rounded-full" />
+				<div className="flex items-center gap-1 pt-1">
+					<Skeleton className="size-7 rounded-full" />
+					<Skeleton className="size-7 rounded-full" />
+					<Skeleton className="size-7 rounded-full" />
 				</div>
 			</div>
 		</div>
