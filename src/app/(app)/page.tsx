@@ -56,15 +56,13 @@ export default function AppHomePage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="rounded-2xl px-8 py-8 mt-2 mb-8 bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-border/30 shadow-lg flex flex-col gap-4">
-          <HeroBanner onExploreClick={handleExploreClick} />
-        </div>
+        <HeroBanner onExploreClick={handleExploreClick} />
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 flex flex-col items-start">
         {/* Genre Filter */}
-        <div className="mb-12">
+        <div className="mt-2 mb-4">
           <GenreFilter
             activeGenre={activeGenre}
             onGenreChange={setActiveGenre}
@@ -75,7 +73,7 @@ export default function AppHomePage() {
         <div className="space-y-16">
           {/* Newest Drops */}
           <section>
-            <div className="mb-8">
+            <div className="mt-4">
               <h2 className="text-[20px] font-bold text-foreground mb-2">
                 Latest Releases
               </h2>
@@ -97,7 +95,7 @@ export default function AppHomePage() {
 
           {/* Top Gainers */}
           <section>
-            <div className="mb-8">
+            <div className="mt-4">
               <h2 className="text-[20px] font-bold text-foreground mb-2">
                 Trending Now
               </h2>
@@ -119,7 +117,7 @@ export default function AppHomePage() {
 
           {/* Most Valuable */}
           <section>
-            <div className="mb-8">
+            <div className="mt-4">
               <h2 className="text-[20px] font-bold text-foreground mb-2">
                 Top Charts
               </h2>
