@@ -1,11 +1,24 @@
+import { useState } from "react";
 import { CoinCarousel } from "./_components/coin-carousel";
+import GenreFilter from "./_components/genre-filter";
 import HeroBanner from "./_components/hero-banner";
 
 export default function AppHomePage() {
-	return (
-		<div className="rounded-2xl bg-muted/80 shadow-lg p-8 mt-6 mb-6">
-			<HeroBanner />
+	// State for active genre (ready for future integration)
+	const [activeGenre, setActiveGenre] = useState("All");
 
+	// Handler for HeroBanner Explore button (stub for now)
+	function handleExploreClick() {
+		// e.g., set a trending tab, scroll, or log
+		// console.log("Explore Trending clicked");
+	}
+
+	return (
+		<div>
+			<HeroBanner onExploreClick={handleExploreClick} />
+			<div className="mt-8 mb-12">
+				<GenreFilter activeGenre={activeGenre} onGenreChange={setActiveGenre} />
+			</div>
 			<div className="my-12 space-y-12">
 				<CoinCarousel title="🚀 Newest Drops" type="newest" />
 				<CoinCarousel title="🔥 Top Gainers (24h)" type="top-gainers" />

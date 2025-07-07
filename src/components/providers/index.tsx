@@ -9,35 +9,35 @@ import { http } from "wagmi";
 import { env } from "@/env";
 
 const config = createConfig({
-  chains: [base],
-  transports: {
-    [base.id]: http(),
-  },
+	chains: [base],
+	transports: {
+		[base.id]: http(),
+	},
 });
 
 const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <PrivyProvider
-      appId={env.NEXT_PUBLIC_PRIVY_APP_ID}
-      config={{
-        appearance: {
-          theme: "dark",
-          logo: "https://tiudovdsloasaofqsvdb.supabase.co/storage/v1/object/public/logo//dropsynq-logo.png",
-        },
-        embeddedWallets: {
-          ethereum: {
-            createOnLogin: "users-without-wallets",
-          },
-        },
-        defaultChain: base,
-        supportedChains: [base],
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={config}>{children}</WagmiProvider>
-      </QueryClientProvider>
-    </PrivyProvider>
-  );
+	return (
+		<PrivyProvider
+			appId={env.NEXT_PUBLIC_PRIVY_APP_ID}
+			config={{
+				appearance: {
+					theme: "dark",
+					logo: "https://tiudovdsloasaofqsvdb.supabase.co/storage/v1/object/public/logo//dropsynq-logo.png",
+				},
+				embeddedWallets: {
+					ethereum: {
+						createOnLogin: "users-without-wallets",
+					},
+				},
+				defaultChain: base,
+				supportedChains: [base],
+			}}
+		>
+			<QueryClientProvider client={queryClient}>
+				<WagmiProvider config={config}>{children}</WagmiProvider>
+			</QueryClientProvider>
+		</PrivyProvider>
+	);
 }

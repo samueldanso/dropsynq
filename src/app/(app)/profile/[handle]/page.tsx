@@ -82,7 +82,7 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="rounded-2xl bg-muted/80 shadow-lg p-8 mt-6 mb-6">
+		<div>
 			<ProfileHeader profile={profile.data} balances={balances.data} />
 			<div className="mt-8">
 				<ProfileTabs
