@@ -78,7 +78,7 @@ export function AppSidebar() {
           <Image src="/icon.svg" alt="Logo" width={32} height={32} priority />
         </div>
         {/* Center: Main Nav */}
-        <nav className="flex-1 flex flex-col justify-center items-center gap-2">
+        <nav className="flex flex-col items-center gap-2 mt-6 w-full">
           {/* Toggle button as first nav item */}
           <button
             type="button"
@@ -101,7 +101,7 @@ export function AppSidebar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center justify-center"
+                className="flex items-center justify-center w-full"
                 onClick={
                   isProtected && !authenticated
                     ? (e) => {
@@ -121,7 +121,7 @@ export function AppSidebar() {
                       : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                   )}
                 >
-                  <IconComponent className="h-5 w-5" />
+                  <IconComponent className="h-5 w-5 mx-auto" />
                 </span>
               </Link>
             );
@@ -155,7 +155,7 @@ export function AppSidebar() {
         </button>
       </div>
       {/* Center: Main Nav */}
-      <nav className="flex-1 flex flex-col justify-center gap-2">
+      <nav className="flex flex-col gap-2 mt-6">
         {navLinks.map((link) => {
           const isActive = link.isActive();
           const IconComponent = link.iconFill
