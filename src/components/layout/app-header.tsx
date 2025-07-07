@@ -228,7 +228,7 @@ export function AppHeader() {
 
 	if (isMobile) {
 		return (
-			<header className="flex h-16 w-full items-center justify-between bg-background px-6">
+			<header className="flex h-16 w-full items-center justify-between px-6 bg-transparent shadow-none border-none">
 				{/* Right: Upload, Notifications, Profile */}
 				<div className="flex items-center gap-3 ml-auto">
 					<UploadButton />
@@ -265,7 +265,7 @@ export function AppHeader() {
 	}
 
 	return (
-		<header className="flex h-16 w-full items-center bg-card rounded-2xl shadow-lg border px-8 mt-4 mx-4">
+		<header className="flex h-16 w-full items-center px-8 mt-4 mx-4 bg-transparent shadow-none border-none">
 			{/* Center: Search Bar */}
 			<div className="mx-auto max-w-md flex-1">
 				<SearchBar />
