@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
 	type ExploreResponse,
+	getCoin,
 	getCoinsMostValuable,
 	getCoinsNew,
 	getCoinsTopGainers,
@@ -10,6 +11,7 @@ import {
 import { useState } from "react";
 import MusicPlayer from "@/components/shared/music-player";
 import { TrackCard } from "@/components/shared/track-card";
+import type { ZoraCoin } from "@/types/zora";
 import GenreFilter from "./_components/genre-filter";
 import HeroBanner from "./_components/hero-banner";
 import { HorizontalScroller } from "./_components/horizontal-scroller";
@@ -44,6 +46,22 @@ function mapDbSongToCoin(song: any) {
 		createdAt: song.created_at,
 		// Add more fields as needed
 	};
+}
+
+// Utility to enrich DB coins with Zora SDK details
+async function enrichCoinsWithZora(
+	dbCoins: { coin_address: string }[],
+): Promise<ZoraCoin[]> {
+	return Promise.all(
+		dbCoins.map(async (dbCoin) => {
+			try {
+				const res = await getCoin({ address: dbCoin.coin_address });
+				return res.zora20Token as ZoraCoin;
+			} catch (e) {
+				return null;
+			}
+		}),
+	).then((coins) => coins.filter(Boolean) as ZoraCoin[]);
 }
 
 export default function AppHomePage() {
@@ -94,6 +112,25 @@ export default function AppHomePage() {
 		enabled: dbTop.length === 0,
 	});
 
+	// Enrich DB coins with Zora SDK details
+	const { data: enrichedRecent = [], isLoading: loadingEnrichedRecent } =
+		useQuery({
+			queryKey: ["enriched-coins", dbRecent],
+			queryFn: () => enrichCoinsWithZora(dbRecent),
+			enabled: dbRecent.length > 0,
+		});
+	const { data: enrichedTrending = [], isLoading: loadingEnrichedTrending } =
+		useQuery({
+			queryKey: ["enriched-coins", dbTrending],
+			queryFn: () => enrichCoinsWithZora(dbTrending),
+			enabled: dbTrending.length > 0,
+		});
+	const { data: enrichedTop = [], isLoading: loadingEnrichedTop } = useQuery({
+		queryKey: ["enriched-coins", dbTop],
+		queryFn: () => enrichCoinsWithZora(dbTop),
+		enabled: dbTop.length > 0,
+	});
+
 	function handleExploreClick() {}
 
 	function handlePlay(coin: any) {
@@ -106,13 +143,10 @@ export default function AppHomePage() {
 		setIsPlayerOpen(true);
 	}
 
-	// Prefer DB data, fallback to Zora SDK
-	const recentCoins =
-		dbRecent.length > 0 ? dbRecent.map(mapDbSongToCoin) : newestCoins;
-	const trending =
-		dbTrending.length > 0 ? dbTrending.map(mapDbSongToCoin) : topGainers;
-	const topCharts =
-		dbTop.length > 0 ? dbTop.map(mapDbSongToCoin) : trendingCoins;
+	// Prefer enriched DB data, fallback to Zora SDK
+	const recentCoins = dbRecent.length > 0 ? enrichedRecent : newestCoins;
+	const trending = dbTrending.length > 0 ? enrichedTrending : topGainers;
+	const topCharts = dbTop.length > 0 ? enrichedTop : trendingCoins;
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -131,7 +165,7 @@ export default function AppHomePage() {
 								Latest Releases
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingDbRecent && dbRecent.length === 0 && loadingNew
+								{loadingEnrichedRecent && dbRecent.length === 0 && loadingNew
 									? generateSkeletonKeys(6, "skeleton-new").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
@@ -156,7 +190,9 @@ export default function AppHomePage() {
 								Trending Now
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingDbTrending && dbTrending.length === 0 && loadingGainers
+								{loadingEnrichedTrending &&
+								dbTrending.length === 0 &&
+								loadingGainers
 									? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
@@ -181,7 +217,7 @@ export default function AppHomePage() {
 								Top Charts
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingDbTop && dbTop.length === 0 && loadingTrending
+								{loadingEnrichedTop && dbTop.length === 0 && loadingTrending
 									? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
