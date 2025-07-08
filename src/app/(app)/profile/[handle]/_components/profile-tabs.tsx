@@ -85,7 +85,7 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 				{/* Tab Content */}
 				{activeTab === "drops" && (
 					<TrackList
-						coins={coins}
+						coins={coins ?? []}
 						onPlay={(coin: any, isPlaying: boolean) => {
 							if (isTrackPlaying(coin) && isPlaying) handlePause();
 							else handlePlay(coin);
@@ -101,7 +101,7 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 				)}
 				{activeTab === "collection" && (
 					<Collections
-						balances={balances}
+						balances={balances ?? []}
 						playerTrack={playerTrack}
 						isPlayerOpen={isPlayerOpen}
 						onPlay={(coin: any, isPlaying: boolean) => {
