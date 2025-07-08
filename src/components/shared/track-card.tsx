@@ -4,6 +4,7 @@ import type { GetCoinResponse } from "@zoralabs/coins-sdk";
 import { DollarSign, Play, Share2, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import BuyCoinButton from "./buy-coin-button";
 import { LikeButton } from "./like-button";
@@ -90,6 +91,7 @@ interface TrackCardProps {
 }
 
 export function TrackCard({ coin, onPlay }: TrackCardProps) {
+	const router = useRouter();
 	const { ready, authenticated, login } =
 		require("@privy-io/react-auth").usePrivy();
 
@@ -106,20 +108,32 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 		e.stopPropagation();
 		const handle = coin.creatorProfile?.handle;
 		const address = coin.creatorAddress;
-		if (handle) window.location.href = `/profile/${handle}`;
-		else if (address) window.location.href = `/profile/${address}`;
+		if (handle) router.push(`/profile/${handle}`);
+		else if (address) router.push(`/profile/${address}`);
 	};
 
 	// Flat card, no border/ring/bg, taller header
+	function handleCardClick(e: React.MouseEvent) {
+		// Only navigate if the click is not on a child interactive element
+		router.push(`/track/${coin.address}`);
+	}
+
+	function handleCardKeyDown(e: React.KeyboardEvent) {
+		if (e.key === "Enter" || e.key === " ") {
+			router.push(`/track/${coin.address}`);
+		}
+	}
 	return (
-		<Link
-			href={`/track/${coin.address}`}
+		<button
+			type="button"
 			className="group relative w-[220px] h-[300px] cursor-pointer rounded-xl bg-transparent transition-all duration-300 overflow-hidden flex flex-col shadow-none border-none"
 			tabIndex={0}
 			aria-label={`View details for ${coin.name}`}
+			onClick={handleCardClick}
+			onKeyDown={handleCardKeyDown}
 		>
 			{/* Header: Cover + Play */}
-			<div className="relative w-full h-[190px] rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
+			<div className="relative w-full aspect-square max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
 				{coin.mediaContent?.previewImage?.medium ? (
 					<Image
 						src={coin.mediaContent.previewImage.medium}
@@ -140,11 +154,11 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 						e.stopPropagation();
 						onPlay?.(coin);
 					}}
-					className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300"
+					className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300"
 					aria-label="Play preview"
 				>
-					<div className="flex items-center justify-center size-16 bg-white/30 backdrop-blur-sm rounded-full shadow-lg">
-						<Play className="size-7 text-white ml-1" />
+					<div className="flex items-center justify-center size-14 bg-[#FF9900] rounded-full shadow-lg">
+						<Play className="size-7 text-black ml-1" />
 					</div>
 				</button>
 				{/* Symbol Badge */}
@@ -174,10 +188,15 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					<button
 						type="button"
 						className="hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none text-sm"
-						onClick={handleArtistClick}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleArtistClick(e);
+						}}
 						onKeyUp={(e) => {
-							if (e.key === "Enter" || e.key === " ")
+							if (e.key === "Enter" || e.key === " ") {
+								e.stopPropagation();
 								handleArtistClick(e as any);
+							}
 						}}
 						tabIndex={0}
 						aria-label="View artist profile"
@@ -201,6 +220,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 						coinAddress={coin.address}
 						showCount={false}
 						className="size-7 rounded-full"
+						// Ensure LikeButton stops propagation internally if needed
 					/>
 					<button
 						type="button"
@@ -227,18 +247,18 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 				<div className="mt-2">
 					<button
 						type="button"
-						className="w-full py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition"
+						className="w-full py-2 rounded-xl bg-[#FF9900] text-black font-semibold text-sm hover:bg-[#e88a00] transition"
 						onClick={(e) => {
 							e.stopPropagation();
 							if (!authenticated) login();
-							else window.location.href = `/track/${coin.address}`;
+							else router.push(`/track/${coin.address}`);
 						}}
 					>
 						Buy
 					</button>
 				</div>
 			</div>
-		</Link>
+		</button>
 	);
 }
 

@@ -9,7 +9,7 @@ interface TrackListProps {
 export function TrackList({ coins }: TrackListProps) {
 	if (!coins) {
 		return (
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<TrackCardSkeleton />
 				<TrackCardSkeleton />
 				<TrackCardSkeleton />
@@ -26,7 +26,7 @@ export function TrackList({ coins }: TrackListProps) {
 	}
 
 	return (
-		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			{coins.map((coin) => (
 				<TrackCard key={coin.address} coin={coin} />
 			))}

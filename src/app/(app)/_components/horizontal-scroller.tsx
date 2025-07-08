@@ -16,7 +16,7 @@ interface HorizontalScrollerProps {
 
 export function HorizontalScroller({
 	children,
-	cardsToShow = 4,
+	cardsToShow = 5,
 }: HorizontalScrollerProps) {
 	const allCards = Children.toArray(children).filter(isValidElement);
 	const [startIndex, setStartIndex] = useState(0);

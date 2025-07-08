@@ -25,7 +25,7 @@ export function Collections({ balances }: CollectionsProps) {
 	}
 
 	return (
-		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			{collections.map((balance) => {
 				if (!balance.coin) return null;
 				// Only add fallback if zoraComments is present or possibly missing

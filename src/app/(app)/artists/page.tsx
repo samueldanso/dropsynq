@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getCoinsTopGainers, getProfile } from "@zoralabs/coins-sdk";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,22 +25,25 @@ function ArtistCard({ profile }: { profile: ZoraProfile }) {
 	return (
 		<Link
 			href={href}
-			className="flex flex-col items-center gap-2 group focus:outline-none"
+			className="flex flex-col items-start gap-3 group focus:outline-none"
 			tabIndex={0}
 			aria-label={`View profile for ${name}`}
 		>
 			{profile.avatar?.medium ? (
-				<img
+				<Image
 					src={profile.avatar.medium}
 					alt={name}
-					className="size-24 rounded-full object-cover border border-muted group-hover:scale-105 group-focus:scale-105 transition"
+					width={144}
+					height={144}
+					className="rounded-full object-cover border border-muted group-hover:scale-105 group-focus:scale-105 transition"
+					priority={false}
 				/>
 			) : (
-				<div className="size-24 rounded-full bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground group-hover:scale-105 group-focus:scale-105 transition">
+				<div className="size-36 rounded-full bg-muted flex items-center justify-center text-4xl font-bold text-muted-foreground group-hover:scale-105 group-focus:scale-105 transition">
 					{name[0]}
 				</div>
 			)}
-			<span className="text-base font-medium text-center truncate max-w-[96px]">
+			<span className="text-lg font-medium text-left truncate max-w-[144px] w-full">
 				{name}
 			</span>
 		</Link>
@@ -105,7 +109,7 @@ export default function ArtistsPage() {
 
 	return (
 		<div className="max-w-3xl mx-auto py-10">
-			<h1 className="text-3xl font-bold mb-8 text-center">Discover Artists</h1>
+			<h1 className="text-3xl font-bold mb-8 text-center">Popular Artists</h1>
 			{isLoading ? (
 				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
 					{[

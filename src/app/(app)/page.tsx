@@ -68,7 +68,7 @@ export default function AppHomePage() {
 							<h2 className="text-[20px] font-bold text-foreground mb-3 mt-2">
 								Latest Releases
 							</h2>
-							<HorizontalScroller cardsToShow={4}>
+							<HorizontalScroller cardsToShow={5}>
 								{loadingNew
 									? generateSkeletonKeys(6, "skeleton-new").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
@@ -87,7 +87,7 @@ export default function AppHomePage() {
 							<h2 className="text-[20px] font-bold text-foreground mb-3 mt-2">
 								Trending Now
 							</h2>
-							<HorizontalScroller cardsToShow={4}>
+							<HorizontalScroller cardsToShow={5}>
 								{loadingGainers
 									? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
@@ -106,7 +106,7 @@ export default function AppHomePage() {
 							<h2 className="text-[20px] font-bold text-foreground mb-3 mt-2">
 								Top Charts
 							</h2>
-							<HorizontalScroller cardsToShow={4}>
+							<HorizontalScroller cardsToShow={5}>
 								{loadingTrending
 									? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />

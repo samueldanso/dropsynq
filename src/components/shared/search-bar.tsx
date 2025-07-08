@@ -141,7 +141,7 @@ export const SearchBar = () => {
 				onChange={handleInputChange}
 				onKeyDown={handleKeyDown}
 				onFocus={() => query.trim().length > 0 && setIsOpen(true)}
-				className="h-10 w-full rounded-full border bg-input text-foreground shadow-md pl-11 pr-4 focus:bg-background focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+				className="h-10 w-full rounded-full bg-input text-foreground shadow-md pl-11 pr-4 placeholder:text-muted-foreground"
 			/>
 
 			{/* Search Results Dropdown */}

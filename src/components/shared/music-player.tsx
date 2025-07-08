@@ -44,7 +44,7 @@ export default function MusicPlayer({
 		wavesurferRef.current = WaveSurfer.create({
 			container: waveformRef.current,
 			waveColor: "#888",
-			progressColor: "#4F4A85",
+			progressColor: "#FF9900", // brand color
 			barWidth: 2,
 			barRadius: 2,
 			height: 48,
@@ -183,13 +183,13 @@ export default function MusicPlayer({
 					<button
 						onClick={handlePlayPause}
 						type="button"
-						className="rounded-full p-2 bg-muted hover:bg-accent transition-colors"
+						className="rounded-full p-2 bg-[#FF9900] hover:bg-[#e88a00] transition-colors"
 						aria-label={isPlaying ? "Pause" : "Play"}
 					>
 						{isPlaying ? (
-							<Pause className="size-6" />
+							<Pause className="size-6 text-black" />
 						) : (
-							<Play className="size-6" />
+							<Play className="size-6 text-black" />
 						)}
 					</button>
 					{/* Progress Bar */}
@@ -203,7 +203,7 @@ export default function MusicPlayer({
 							max={100}
 							value={progress}
 							onChange={handleSeek}
-							className="w-full accent-primary h-1"
+							className="w-full h-1 accent-[#FF9900] music-player-range"
 						/>
 						<span className="text-xs tabular-nums w-10 text-left">
 							{formatTime(duration)}
@@ -223,4 +223,28 @@ export default function MusicPlayer({
 			</div>
 		</div>
 	);
+}
+
+// Custom styles for range input fallback
+if (typeof window !== "undefined") {
+	const styleId = "music-player-range-style";
+	if (!document.getElementById(styleId)) {
+		const style = document.createElement("style");
+		style.id = styleId;
+		style.innerHTML = `
+		input.music-player-range::-webkit-slider-thumb {
+			background: #FF9900;
+		}
+		input.music-player-range::-webkit-slider-runnable-track {
+			background: linear-gradient(to right, #FF9900 var(--progress, 0%), #e5e7eb var(--progress, 0%));
+		}
+		input.music-player-range::-moz-range-thumb {
+			background: #FF9900;
+		}
+		input.music-player-range::-ms-fill-lower {
+			background: #FF9900;
+		}
+		`;
+		document.head.appendChild(style);
+	}
 }
