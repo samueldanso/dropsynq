@@ -1,261 +1,178 @@
 "use client";
 
-// @ts-expect-error: howler types may be missing, suppress for now
-import { Howl } from "howler";
 import { Pause, Play, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import WaveSurfer from "wavesurfer.js";
 import { cn } from "@/lib/utils";
 
 export interface MusicPlayerTrack {
-	title: string;
-	artist: string;
-	audioUrl: string;
-	coverUrl?: string;
+  title: string;
+  artist: string;
+  audioUrl: string;
+  coverUrl?: string;
 }
 
 interface MusicPlayerProps {
-	track: MusicPlayerTrack | null;
-	isOpen: boolean;
-	onClose: () => void;
+  track: MusicPlayerTrack | null;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function MusicPlayer({
-	track,
-	isOpen,
-	onClose,
+  track,
+  isOpen,
+  onClose,
 }: MusicPlayerProps) {
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [progress, setProgress] = useState(0);
-	const [duration, setDuration] = useState(0);
-	const [currentTime, setCurrentTime] = useState(0);
-	const [playbackError, setPlaybackError] = useState(false);
-	const howlRef = useRef<Howl | null>(null);
-	const progressInterval = useRef<NodeJS.Timeout | null>(null);
-	const waveformRef = useRef<HTMLDivElement | null>(null);
-	const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
-	// Initialize and sync wavesurfer
-	useEffect(() => {
-		if (!track || !waveformRef.current) return;
-		if (wavesurferRef.current) {
-			wavesurferRef.current.destroy();
-		}
-		wavesurferRef.current = WaveSurfer.create({
-			container: waveformRef.current,
-			waveColor: "#888",
-			progressColor: "#FF9900", // brand color
-			barWidth: 2,
-			barRadius: 2,
-			height: 48,
-			url: track.audioUrl,
-			interact: true,
-		});
-		wavesurferRef.current.on("ready", () => {
-			setDuration(wavesurferRef.current?.getDuration() || 0);
-		});
-		wavesurferRef.current.on("interaction", (time: number) => {
-			if (howlRef.current) {
-				howlRef.current.seek(time);
-				setCurrentTime(time);
-				setProgress((time / (wavesurferRef.current?.getDuration() || 1)) * 100);
-			}
-		});
-		return () => {
-			wavesurferRef.current?.destroy();
-		};
-	}, [track]);
+  useEffect(() => {
+    if (!track) return;
+    setIsPlaying(false);
+    setProgress(0);
+    setCurrentTime(0);
+    setDuration(0);
+    if (audioRef.current) {
+      audioRef.current.load();
+    }
+  }, [track]);
 
-	// Play/Pause logic
-	useEffect(() => {
-		if (!track) return;
-		if (howlRef.current) {
-			howlRef.current.unload();
-		}
-		setPlaybackError(false);
-		howlRef.current = new Howl({
-			src: [track.audioUrl],
-			html5: true,
-			onload: () => {
-				setDuration(howlRef.current?.duration() || 0);
-			},
-			onend: () => {
-				setIsPlaying(false);
-				setCurrentTime(0);
-				setProgress(0);
-				wavesurferRef.current?.stop();
-			},
-			onloaderror: () => setPlaybackError(true),
-			onplayerror: () => setPlaybackError(true),
-		});
-		setIsPlaying(false);
-		setCurrentTime(0);
-		setProgress(0);
-		return () => {
-			howlRef.current?.unload();
-			if (progressInterval.current) clearInterval(progressInterval.current);
-		};
-	}, [track]);
+  const handlePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
 
-	// Progress bar update
-	useEffect(() => {
-		if (isPlaying && howlRef.current) {
-			progressInterval.current = setInterval(() => {
-				const seek = howlRef.current?.seek() as number;
-				setCurrentTime(seek);
-				setProgress(duration ? (seek / duration) * 100 : 0);
-				wavesurferRef.current?.setTime(seek);
-			}, 500);
-		} else {
-			if (progressInterval.current) clearInterval(progressInterval.current);
-		}
-		return () => {
-			if (progressInterval.current) clearInterval(progressInterval.current);
-		};
-	}, [isPlaying, duration]);
+  const handleTimeUpdate = () => {
+    if (!audioRef.current) return;
+    setCurrentTime(audioRef.current.currentTime);
+    setProgress(duration ? (audioRef.current.currentTime / duration) * 100 : 0);
+  };
 
-	const handlePlayPause = () => {
-		if (!howlRef.current) return;
-		if (isPlaying) {
-			howlRef.current.pause();
-			wavesurferRef.current?.pause();
-			setIsPlaying(false);
-		} else {
-			howlRef.current.play();
-			wavesurferRef.current?.play();
-			setIsPlaying(true);
-		}
-	};
+  const handleLoadedMetadata = () => {
+    if (!audioRef.current) return;
+    setDuration(audioRef.current.duration);
+  };
 
-	const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!howlRef.current) return;
-		const seekTo = (Number(e.target.value) / 100) * duration;
-		howlRef.current.seek(seekTo);
-		wavesurferRef.current?.setTime(seekTo);
-		setCurrentTime(seekTo);
-		setProgress(Number(e.target.value));
-	};
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!audioRef.current) return;
+    const seekTo = (Number(e.target.value) / 100) * duration;
+    audioRef.current.currentTime = seekTo;
+    setCurrentTime(seekTo);
+    setProgress(Number(e.target.value));
+  };
 
-	if (!isOpen || !track) return null;
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setProgress(0);
+  };
 
-	function formatTime(sec: number) {
-		const m = Math.floor(sec / 60)
-			.toString()
-			.padStart(1, "0");
-		const s = Math.floor(sec % 60)
-			.toString()
-			.padStart(2, "0");
-		return `${m}:${s}`;
-	}
+  if (!isOpen || !track) return null;
 
-	return (
-		<div
-			className={cn(
-				"fixed bottom-0 left-0 w-full z-50 flex flex-col items-center justify-between gap-2",
-				"rounded-t-2xl bg-background/95 shadow-2xl px-4 py-1 md:px-8 md:py-2",
-			)}
-		>
-			{/* Waveform Visualization */}
-			<div ref={waveformRef} className="w-full h-6 mb-1 select-none" />
-			{/* Fallback to native audio if playback error */}
-			{playbackError ? (
-				<audio controls src={track.audioUrl} autoPlay style={{ width: "100%" }}>
-					<track kind="captions" />
-					Your browser does not support the audio element.
-				</audio>
-			) : (
-				<div className="flex items-center justify-between w-full gap-4">
-					{/* Track Info */}
-					<div className="flex items-center gap-4 min-w-0">
-						{track.coverUrl && (
-							<Image
-								src={track.coverUrl}
-								alt={track.title}
-								width={36}
-								height={36}
-								className="rounded-lg object-cover"
-							/>
-						)}
-						<div className="min-w-0">
-							<div className="font-semibold truncate text-base md:text-lg">
-								{track.title}
-							</div>
-							<div className="text-muted-foreground text-xs md:text-sm truncate">
-								{track.artist}
-							</div>
-						</div>
-					</div>
-					{/* Controls */}
-					<div className="flex items-center gap-4 flex-1 min-w-0">
-						<button
-							onClick={handlePlayPause}
-							type="button"
-							className="rounded-full p-2 bg-[#FF9900] hover:bg-[#e88a00] transition-colors"
-							aria-label={isPlaying ? "Pause" : "Play"}
-						>
-							{isPlaying ? (
-								<Pause className="size-6 text-black" />
-							) : (
-								<Play
-									className="size-6 text-black fill-current"
-									fill="currentColor"
-								/>
-							)}
-						</button>
-						{/* Progress Bar */}
-						<div className="flex items-center gap-2 flex-1 min-w-0">
-							<span className="text-xs tabular-nums w-10 text-right">
-								{formatTime(currentTime)}
-							</span>
-							<input
-								type="range"
-								min={0}
-								max={100}
-								value={progress}
-								onChange={handleSeek}
-								className="w-full h-1 accent-[#FF9900] music-player-range"
-							/>
-							<span className="text-xs tabular-nums w-10 text-left">
-								{formatTime(duration)}
-							</span>
-						</div>
-					</div>
-					{/* Close Button */}
-					<button
-						onClick={onClose}
-						type="button"
-						className="rounded-full p-2 hover:bg-muted transition-colors"
-						aria-label="Close player"
-					>
-						<X className="size-5" />
-					</button>
-				</div>
-			)}
-		</div>
-	);
-}
+  function formatTime(sec: number) {
+    const m = Math.floor(sec / 60)
+      .toString()
+      .padStart(1, "0");
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${m}:${s}`;
+  }
 
-// Custom styles for range input fallback
-if (typeof window !== "undefined") {
-	const styleId = "music-player-range-style";
-	if (!document.getElementById(styleId)) {
-		const style = document.createElement("style");
-		style.id = styleId;
-		style.innerHTML = `
-		input.music-player-range::-webkit-slider-thumb {
-			background: #FF9900;
-		}
-		input.music-player-range::-webkit-slider-runnable-track {
-			background: transparent;
-		}
-		input.music-player-range::-moz-range-thumb {
-			background: #FF9900;
-		}
-		input.music-player-range::-ms-fill-lower {
-			background: #FF9900;
-		}
-		`;
-		document.head.appendChild(style);
-	}
+  return (
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 w-full z-50 flex flex-col items-center justify-between gap-2",
+        "rounded-t-2xl bg-background/95 shadow-2xl px-4 py-1 md:px-8 md:py-2"
+      )}
+    >
+      <div className="flex items-center justify-between w-full gap-4">
+        {/* Track Info */}
+        <div className="flex items-center gap-4 min-w-0">
+          {track.coverUrl && (
+            <Image
+              src={track.coverUrl}
+              alt={track.title}
+              width={36}
+              height={36}
+              className="rounded-lg object-cover"
+            />
+          )}
+          <div className="min-w-0">
+            <div className="font-semibold truncate text-base md:text-lg">
+              {track.title}
+            </div>
+            <div className="text-muted-foreground text-xs md:text-sm truncate">
+              {track.artist}
+            </div>
+          </div>
+        </div>
+        {/* Controls */}
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <button
+            onClick={handlePlayPause}
+            type="button"
+            className="rounded-full p-2 bg-[#FF9900] hover:bg-[#e88a00] transition-colors"
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <Pause className="size-6 text-black" />
+            ) : (
+              <Play
+                className="size-6 text-black fill-current"
+                fill="currentColor"
+              />
+            )}
+          </button>
+          {/* Progress Bar */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-xs tabular-nums w-10 text-right">
+              {formatTime(currentTime)}
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={progress}
+              onChange={handleSeek}
+              className="w-full h-1 accent-[#FF9900] music-player-range"
+            />
+            <span className="text-xs tabular-nums w-10 text-left">
+              {formatTime(duration)}
+            </span>
+          </div>
+        </div>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          type="button"
+          className="rounded-full p-2 hover:bg-muted transition-colors"
+          aria-label="Close player"
+        >
+          <X className="size-5" />
+        </button>
+      </div>
+      {/* Native Audio Element (hidden) */}
+      <audio
+        ref={audioRef}
+        src={track.audioUrl}
+        preload="auto"
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleEnded}
+        style={{ display: "none" }}
+      >
+        <track kind="captions" />
+      </audio>
+    </div>
+  );
 }
