@@ -1,6 +1,7 @@
 "use client";
 
 import type { GetProfileBalancesResponse } from "@zoralabs/coins-sdk";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { ZoraCoin, ZoraProfile } from "@/types/zora";
 import { Collections } from "./collections";
@@ -18,9 +19,12 @@ interface ProfileTabsProps {
 }
 
 export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
-	const [activeTab, setActiveTab] = useState<string>("drops");
+	const searchParams = useSearchParams();
+	const initialTab = searchParams.get("tab") || "drops";
+	const [activeTab, setActiveTab] = useState<string>(initialTab);
 	const tabs = [
 		{ id: "drops", label: "Drops" },
+		{ id: "favorites", label: "Favorites" },
 		{ id: "collection", label: "Collections" },
 		{ id: "upcoming", label: "Upcoming" },
 	];
@@ -47,6 +51,11 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 
 			{/* Tab Content */}
 			{activeTab === "drops" && <TrackList coins={coins} />}
+			{activeTab === "favorites" && (
+				<div className="flex items-center justify-center p-8 text-center text-muted-foreground">
+					<p>Favorites coming soon.</p>
+				</div>
+			)}
 			{activeTab === "collection" && <Collections balances={balances} />}
 			{activeTab === "upcoming" && <UpcomingDrops />}
 		</div>

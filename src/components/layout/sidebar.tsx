@@ -3,7 +3,7 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@zoralabs/coins-sdk";
-import { Music2, PanelLeftOpen } from "lucide-react";
+import { Heart, Music2, PanelLeftOpen, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -125,7 +125,7 @@ export function AppSidebar() {
 					<Image src="/icon.svg" alt="Logo" width={32} height={32} priority />
 				</div>
 				{/* Center: Main Nav */}
-				<nav className="flex flex-col items-center gap-2 mt-6 w-full">
+				<nav className="flex flex-col items-center gap-2 mt-6 w-full flex-1">
 					{/* Toggle button as first nav item */}
 					<button
 						type="button"
@@ -135,13 +135,15 @@ export function AppSidebar() {
 					>
 						<PanelLeftOpen className="h-5 w-5" />
 					</button>
+					{/* Main nav icons */}
 					{mainNavLinks.map((link) => {
 						const isActive = link.isActive();
-						const IconComponent = isActive ? link.iconFill : link.icon;
-						const isProtected =
-							link.label === "Profile" ||
-							link.label === "Library" ||
-							link.label === "Messages";
+						const IconComponent = link.iconFill
+							? isActive
+								? link.iconFill
+								: link.icon
+							: link.icon;
+						const isProtected = link.label === "Profile";
 						return (
 							<Link
 								key={link.href}
@@ -162,7 +164,7 @@ export function AppSidebar() {
 										isProtected && !authenticated
 											? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
 											: isActive
-												? "bg-muted text-foreground"
+												? "text-foreground"
 												: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
 									)}
 								>
@@ -171,7 +173,39 @@ export function AppSidebar() {
 							</Link>
 						);
 					})}
+					{/* My Library icons */}
+					<div className="flex flex-col items-center gap-2 mt-8">
+						{[
+							{ label: "Tracks", icon: Music2, tab: "drops" },
+							{ label: "Favorites", icon: Heart, tab: "favorites" },
+							{ label: "Collections", icon: Star, tab: "collection" },
+						].map((link) => {
+							const IconComponent = link.icon;
+							return (
+								<Link
+									key={link.tab}
+									href={profileHref + `?tab=${link.tab}`}
+									className="flex items-center justify-center w-full"
+								>
+									<span className="flex items-center justify-center w-10 h-10 rounded-full transition-colors text-muted-foreground hover:bg-accent/50 hover:text-foreground">
+										<IconComponent className="h-5 w-5 mx-auto" />
+									</span>
+								</Link>
+							);
+						})}
+					</div>
 				</nav>
+				{/* Profile icon at bottom */}
+				<div className="flex flex-col items-center mb-4 mt-auto">
+					<Link
+						href={profileHref}
+						className="flex items-center justify-center w-full"
+					>
+						<span className="flex items-center justify-center w-10 h-10 rounded-full transition-colors text-muted-foreground hover:bg-accent/50 hover:text-foreground">
+							<PersonIcon className="h-5 w-5 mx-auto" />
+						</span>
+					</Link>
+				</div>
 			</div>
 		);
 	}
@@ -211,7 +245,7 @@ export function AppSidebar() {
 							className={cn(
 								"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
 								isActive
-									? "text-foreground bg-muted"
+									? "text-foreground font-semibold"
 									: "text-muted-foreground hover:bg-muted hover:text-foreground",
 							)}
 						>
@@ -240,7 +274,7 @@ export function AppSidebar() {
 								isProtected && !authenticated
 									? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
 									: isActive
-										? "text-foreground bg-muted"
+										? "text-foreground font-semibold"
 										: "text-muted-foreground hover:bg-muted hover:text-foreground",
 							)}
 							onClick={
@@ -265,7 +299,7 @@ export function AppSidebar() {
 					className={cn(
 						"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
 						profileLink.isActive()
-							? "text-foreground bg-muted"
+							? "text-foreground font-semibold"
 							: "text-muted-foreground hover:bg-muted hover:text-foreground",
 					)}
 				>
