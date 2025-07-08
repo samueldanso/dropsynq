@@ -22,6 +22,13 @@ const mapEdges = (response: ExploreResponse) =>
 const generateSkeletonKeys = (count: number, prefix: string) =>
   Array.from({ length: count }, (_, i) => `${prefix}-${i}-${Date.now()}`);
 
+// Helper: filter for audio coins only
+function filterAudioCoins(coins: any[]) {
+  return coins.filter((coin) =>
+    coin.mediaContent?.mimeType?.startsWith("audio/")
+  );
+}
+
 export default function AppHomePage() {
   const [activeGenre, setActiveGenre] = useState("All");
   const [playerTrack, setPlayerTrack] = useState<any | null>(null);
@@ -73,7 +80,7 @@ export default function AppHomePage() {
                   ? generateSkeletonKeys(6, "skeleton-new").map((key) => (
                       <div key={key} className="w-[300px] flex-shrink-0" />
                     ))
-                  : newestCoins.map((coin) => (
+                  : filterAudioCoins(newestCoins).map((coin) => (
                       <TrackCard
                         key={coin.address}
                         coin={coin}
@@ -92,7 +99,7 @@ export default function AppHomePage() {
                   ? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
                       <div key={key} className="w-[300px] flex-shrink-0" />
                     ))
-                  : topGainers.map((coin) => (
+                  : filterAudioCoins(topGainers).map((coin) => (
                       <TrackCard
                         key={coin.address}
                         coin={coin}
@@ -111,7 +118,7 @@ export default function AppHomePage() {
                   ? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
                       <div key={key} className="w-[300px] flex-shrink-0" />
                     ))
-                  : trendingCoins.map((coin) => (
+                  : filterAudioCoins(trendingCoins).map((coin) => (
                       <TrackCard
                         key={coin.address}
                         coin={coin}

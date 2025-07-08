@@ -7,7 +7,12 @@ interface TrackListProps {
 }
 
 export function TrackList({ coins }: TrackListProps) {
-  if (!coins) {
+  // Filter for audio coins only
+  const audioCoins = coins?.filter((coin) =>
+    coin.mediaContent?.mimeType?.startsWith("audio/")
+  );
+
+  if (!audioCoins) {
     return (
       <div className="grid gap-1 md:grid-cols-3 lg:grid-cols-5">
         <TrackCardSkeleton />
@@ -17,7 +22,7 @@ export function TrackList({ coins }: TrackListProps) {
     );
   }
 
-  if (coins.length === 0) {
+  if (audioCoins.length === 0) {
     return (
       <div className="flex items-center justify-center p-8 text-center text-muted-foreground">
         <p>This user hasn&apos;t posted any song yet.</p>
@@ -27,7 +32,7 @@ export function TrackList({ coins }: TrackListProps) {
 
   return (
     <div className="grid gap-1 md:grid-cols-3 lg:grid-cols-5">
-      {coins.map((coin) => (
+      {audioCoins.map((coin) => (
         <TrackCard key={coin.address} coin={coin} />
       ))}
     </div>

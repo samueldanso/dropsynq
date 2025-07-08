@@ -13,7 +13,10 @@ interface CollectionsProps {
 
 export function Collections({ balances }: CollectionsProps) {
   const collections = balances?.filter(
-    (balance) => balance.coin && Number(balance.balance) > 0
+    (balance) =>
+      balance.coin &&
+      Number(balance.balance) > 0 &&
+      balance.coin.mediaContent?.mimeType?.startsWith("audio/")
   );
 
   if (!collections || collections.length === 0) {
