@@ -32,7 +32,11 @@ export function ProfileHeader({ profile, balances }: ProfileHeaderProps) {
 		connectedAddress.toLowerCase() ===
 			profile.publicWallet.walletAddress.toLowerCase();
 	const displayName = profile.displayName || "Anonymous";
-	const dropsCount = balances?.length || 0;
+	// Only count coins with audio mime types as Drops
+	const dropsCount =
+		balances?.filter((b) =>
+			b.coin?.mediaContent?.mimeType?.startsWith("audio/"),
+		).length || 0;
 
 	return (
 		<div className="flex w-full flex-col items-center justify-center gap-6 pb-8">

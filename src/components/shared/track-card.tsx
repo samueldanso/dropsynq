@@ -129,13 +129,12 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 		}
 	}
 	return (
-		<div
+		<button
+			type="button"
 			className="track-card-root group relative w-[220px] h-[300px] cursor-pointer rounded-xl bg-transparent transition-all duration-300 overflow-hidden flex flex-col shadow-none border-none"
-			tabIndex={0}
 			aria-label={`View details for ${coin.name}`}
 			onClick={handleCardClick}
 			onKeyDown={handleCardKeyDown}
-			role="button"
 		>
 			{/* Header: Cover + Play */}
 			<div className="relative w-full aspect-[3/4] max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
@@ -152,18 +151,22 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 						<Play className="size-14 text-white/30" />
 					</div>
 				)}
-				{/* Play Overlay */}
-				<Button
-					type="button"
-					data-play
-					size="icon"
-					variant="ghost"
+				{/* Play Overlay - always centered, only visible on hover/focus */}
+				<div
+					role="button"
+					tabIndex={0}
+					aria-label="Play preview"
 					onClick={(e) => {
 						e.stopPropagation();
 						onPlay?.(coin);
 					}}
-					className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:opacity-100"
-					aria-label="Play preview"
+					onKeyDown={(e) => {
+						if (e.key === "Enter" || e.key === " ") {
+							e.stopPropagation();
+							onPlay?.(coin);
+						}
+					}}
+					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center bg-black/0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-200 focus:opacity-100 size-16 outline-none cursor-pointer"
 				>
 					<div className="flex items-center justify-center size-14 bg-[#FF9900] rounded-full shadow-lg">
 						<Play
@@ -171,7 +174,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 							fill="currentColor"
 						/>
 					</div>
-				</Button>
+				</div>
 				{/* Symbol Badge */}
 				<div className="absolute top-2 right-2">
 					<span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
@@ -269,7 +272,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 					</button>
 				</div>
 			</div>
-		</div>
+		</button>
 	);
 }
 
