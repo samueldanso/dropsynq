@@ -1,14 +1,7 @@
 "use client";
 
 import type { GetCoinResponse } from "@zoralabs/coins-sdk";
-import {
-	DollarSign,
-	Heart,
-	MessageCircle,
-	Play,
-	Share2,
-	Users,
-} from "lucide-react";
+import { DollarSign, Play, Share2, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -141,14 +141,14 @@ export const SearchBar = () => {
 				onChange={handleInputChange}
 				onKeyDown={handleKeyDown}
 				onFocus={() => query.trim().length > 0 && setIsOpen(true)}
-				className="h-10 w-full rounded-full border-none bg-gray-800/60 text-foreground shadow-md pl-11 pr-4 focus:bg-background focus:ring-2 focus:ring-ring placeholder:text-gray-400"
+				className="h-10 w-full rounded-full border bg-input text-foreground shadow-md pl-11 pr-4 focus:bg-background focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
 			/>
 
 			{/* Search Results Dropdown */}
 			{isOpen && (
 				<div
 					ref={dropdownRef}
-					className="absolute left-0 top-13 z-50 max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-background shadow-lg"
+					className="absolute left-0 top-13 z-50 max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-popover shadow-lg"
 				>
 					{/* Filter Tabs */}
 					{debouncedQuery.trim().length > 0 && (

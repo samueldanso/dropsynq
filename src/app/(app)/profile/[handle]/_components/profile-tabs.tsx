@@ -24,9 +24,9 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 	const [activeTab, setActiveTab] = useState<string>(initialTab);
 	const tabs = [
 		{ id: "drops", label: "Drops" },
-		{ id: "favorites", label: "Favorites" },
 		{ id: "collection", label: "Collections" },
 		{ id: "upcoming", label: "Upcoming" },
+		{ id: "favorites", label: "Favorites" },
 	];
 
 	return (

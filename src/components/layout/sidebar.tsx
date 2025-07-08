@@ -8,18 +8,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import BubbleIcon from "@/components/icons/bubble.svg";
 import CoinsIcon from "@/components/icons/coins.svg";
 import CompassIcon from "@/components/icons/compass.svg";
 import CompassFillIcon from "@/components/icons/compassFill.svg";
-import HearthIcon from "@/components/icons/hearth.svg";
-import HearthFillIcon from "@/components/icons/hearthFill.svg";
 import HomeIcon from "@/components/icons/home.svg";
 import HomeFillIcon from "@/components/icons/homeFill.svg";
 import PersonIcon from "@/components/icons/person.svg";
 import PersonFillIcon from "@/components/icons/personFill.svg";
-import StarIcon from "@/components/icons/star.svg";
-import StarFillIcon from "@/components/icons/starFill.svg";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
@@ -39,12 +34,20 @@ export function AppSidebar() {
 		enabled: !!user?.wallet?.address,
 	});
 
-	const profileHref =
+	// Helper to get profile base href
+	const profileBaseHref =
 		ready && authenticated && user?.wallet
 			? zoraProfile?.handle
 				? `/profile/${zoraProfile.handle}`
 				: `/profile/${user.wallet.address}`
 			: "/";
+
+	// My Library links config
+	const myLibraryLinks = [
+		{ label: "Tracks", icon: Music2, tab: "drops" },
+		{ label: "Favorites", icon: Heart, tab: "favorites" },
+		{ label: "Collections", icon: Star, tab: "collection" },
+	];
 
 	const mainNavLinks = [
 		{
@@ -68,41 +71,10 @@ export function AppSidebar() {
 			iconFill: CoinsIcon, // Use same icon for fill since no fill version
 			isActive: () => pathname.startsWith("/drops"),
 		},
-		{
-			href: "/messages",
-			label: "Messages",
-			icon: BubbleIcon,
-			iconFill: BubbleIcon, // Use same icon for fill since no fill version
-			isActive: () => pathname.startsWith("/messages"),
-		},
-	];
-
-	const myLibraryLinks = [
-		{
-			href: "/profile/tracks",
-			label: "Tracks",
-			icon: Music2,
-			iconFill: Music2,
-			isActive: () => pathname === "/profile/tracks",
-		},
-		{
-			href: "/profile/favorites",
-			label: "Favorites",
-			icon: HearthIcon,
-			iconFill: HearthFillIcon,
-			isActive: () => pathname === "/profile/favorites",
-		},
-		{
-			href: "/profile/collections",
-			label: "Collections",
-			icon: StarIcon,
-			iconFill: StarFillIcon,
-			isActive: () => pathname === "/profile/collections",
-		},
 	];
 
 	const profileLink = {
-		href: profileHref,
+		href: profileBaseHref,
 		label: "Profile",
 		icon: PersonIcon,
 		iconFill: PersonFillIcon,
@@ -175,16 +147,12 @@ export function AppSidebar() {
 					})}
 					{/* My Library icons */}
 					<div className="flex flex-col items-center gap-2 mt-8">
-						{[
-							{ label: "Tracks", icon: Music2, tab: "drops" },
-							{ label: "Favorites", icon: Heart, tab: "favorites" },
-							{ label: "Collections", icon: Star, tab: "collection" },
-						].map((link) => {
+						{myLibraryLinks.map((link) => {
 							const IconComponent = link.icon;
 							return (
 								<Link
 									key={link.tab}
-									href={profileHref + `?tab=${link.tab}`}
+									href={`${profileBaseHref}?tab=${link.tab}`}
 									className="flex items-center justify-center w-full"
 								>
 									<span className="flex items-center justify-center w-10 h-10 rounded-full transition-colors text-muted-foreground hover:bg-accent/50 hover:text-foreground">
@@ -198,7 +166,7 @@ export function AppSidebar() {
 				{/* Profile icon at bottom */}
 				<div className="flex flex-col items-center mb-4 mt-auto">
 					<Link
-						href={profileHref}
+						href={profileBaseHref}
 						className="flex items-center justify-center w-full"
 					>
 						<span className="flex items-center justify-center w-10 h-10 rounded-full transition-colors text-muted-foreground hover:bg-accent/50 hover:text-foreground">
@@ -261,50 +229,30 @@ export function AppSidebar() {
 					</div>
 				)}
 				{/* My Library Links */}
-				{myLibraryLinks.map((link) => {
-					const isActive = link.isActive();
-					const IconComponent = isActive ? link.iconFill : link.icon;
-					const isProtected = true; // All My Library items require authentication
-					return (
-						<Link
-							key={link.href}
-							href={link.href}
-							className={cn(
-								"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
-								isProtected && !authenticated
-									? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-									: isActive
-										? "text-foreground font-semibold"
-										: "text-muted-foreground hover:bg-muted hover:text-foreground",
-							)}
-							onClick={
-								isProtected && !authenticated
-									? (e) => {
-											e.preventDefault();
-											login();
-										}
-									: undefined
-							}
-						>
-							<IconComponent className="h-5 w-5" />
-							{!collapsed && <span>{link.label}</span>}
-						</Link>
-					);
-				})}
+				<div className="flex flex-col gap-1">
+					{myLibraryLinks.map((link) => {
+						const IconComponent = link.icon;
+						return (
+							<Link
+								key={link.tab}
+								href={`${profileBaseHref}?tab=${link.tab}`}
+								className="flex items-center gap-3 rounded-lg px-2 py-2 font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+							>
+								<IconComponent className="h-5 w-5" />
+								<span>{link.label}</span>
+							</Link>
+						);
+					})}
+				</div>
 			</nav>
 			{/* Profile at the bottom */}
 			<div className="mt-auto mb-4 px-4">
 				<Link
-					href={profileLink.href}
-					className={cn(
-						"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
-						profileLink.isActive()
-							? "text-foreground font-semibold"
-							: "text-muted-foreground hover:bg-muted hover:text-foreground",
-					)}
+					href={profileBaseHref}
+					className="flex items-center gap-3 rounded-lg px-2 py-2 font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 				>
-					<profileLink.icon className="h-5 w-5" />
-					{!collapsed && <span>{profileLink.label}</span>}
+					<PersonIcon className="h-5 w-5" />
+					<span>Profile</span>
 				</Link>
 			</div>
 		</div>
