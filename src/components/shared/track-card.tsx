@@ -1,94 +1,18 @@
 "use client";
 
-import type { GetCoinResponse } from "@zoralabs/coins-sdk";
 import { DollarSign, Pause, Play, Share2, Users } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { ZoraCoin } from "@/types/zora";
 import BuyCoinButton from "./buy-coin-button";
 import { LikeButton } from "./like-button";
 
-// Base coin type that works for both GetCoinResponse and explore responses
-type BaseCoin = {
-	id: string;
-	name: string;
-	description: string;
-	address: string;
-	symbol: string;
-	totalSupply: string;
-	totalVolume: string;
-	volume24h: string;
-	createdAt?: string;
-	creatorAddress?: string;
-	marketCap: string;
-	marketCapDelta24h: string;
-	chainId: number;
-	tokenUri?: string;
-	platformReferrerAddress?: string;
-	payoutRecipientAddress?: string;
-	creatorProfile?: {
-		id: string;
-		handle: string;
-		avatar?: {
-			previewImage: {
-				blurhash?: string;
-				medium: string;
-				small: string;
-			};
-		};
-	};
-	mediaContent?: {
-		mimeType?: string;
-		originalUri: string;
-		previewImage?: {
-			small: string;
-			medium: string;
-			blurhash?: string;
-		};
-	};
-	uniqueHolders: number;
-	uniswapV4PoolKey: {
-		token0Address: string;
-		token1Address: string;
-		fee: number;
-		tickSpacing: number;
-		hookAddress: string;
-	};
-	uniswapV3PoolAddress: string;
-	// Optional zoraComments for GetCoinResponse
-	zoraComments?: {
-		count: number;
-		edges: Array<{
-			node: {
-				txHash: string;
-				comment: string;
-				userAddress: string;
-				timestamp: number;
-				userProfile?: {
-					id: string;
-					handle: string;
-					avatar?: {
-						previewImage: {
-							blurhash?: string;
-							small: string;
-							medium: string;
-						};
-					};
-				};
-			};
-		}>;
-		pageInfo: {
-			endCursor?: string;
-			hasNextPage: boolean;
-		};
-	};
-};
-
 interface TrackCardProps {
-	coin: BaseCoin;
-	onPlay?: (coin: BaseCoin, isPlaying: boolean) => void;
+	coin: ZoraCoin;
+	onPlay?: (coin: ZoraCoin, isPlaying: boolean) => void;
 	isPlaying?: boolean;
 }
 

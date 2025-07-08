@@ -1,11 +1,11 @@
 "use client";
 
 import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
-import type { BaseCoin } from "@/types/coin";
+import type { ZoraCoin } from "@/types/zora";
 
 interface TrackListProps {
-	coins: BaseCoin[];
-	onPlay?: (coin: BaseCoin, isPlaying: boolean) => void;
+	coins: ZoraCoin[];
+	onPlay?: (coin: ZoraCoin, isPlaying: boolean) => void;
 	playerTrack?: any;
 	isPlayerOpen?: boolean;
 }
