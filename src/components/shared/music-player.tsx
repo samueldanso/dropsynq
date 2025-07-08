@@ -88,6 +88,14 @@ export default function MusicPlayer({
     return `${m}:${s}`;
   }
 
+  function ipfsToHttp(url: string) {
+    if (!url) return url;
+    if (url.startsWith("ipfs://")) {
+      return url.replace("ipfs://", "https://ipfs.io/ipfs/");
+    }
+    return url;
+  }
+
   return (
     <div
       className={cn(
@@ -100,7 +108,7 @@ export default function MusicPlayer({
         <div className="flex items-center gap-4 min-w-0">
           {track.coverUrl && (
             <Image
-              src={track.coverUrl}
+              src={ipfsToHttp(track.coverUrl)}
               alt={track.title}
               width={36}
               height={36}
@@ -164,7 +172,7 @@ export default function MusicPlayer({
       {/* Native Audio Element (hidden) */}
       <audio
         ref={audioRef}
-        src={track.audioUrl}
+        src={ipfsToHttp(track.audioUrl)}
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
