@@ -4,14 +4,14 @@ import "@/lib/zora";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { createConfig, WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 import { http } from "wagmi";
 import { env } from "@/env";
 
 const config = createConfig({
-  chains: [baseSepolia],
+  chains: [base],
   transports: {
-    [baseSepolia.id]: http(),
+    [base.id]: http(),
   },
 });
 
@@ -31,8 +31,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             createOnLogin: "users-without-wallets",
           },
         },
-        defaultChain: baseSepolia,
-        supportedChains: [baseSepolia],
+        defaultChain: base,
+        supportedChains: [base],
       }}
     >
       <QueryClientProvider client={queryClient}>

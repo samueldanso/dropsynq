@@ -12,7 +12,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { Address } from "viem";
 import { createPublicClient, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 import { useAccount, useWalletClient } from "wagmi";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -292,8 +292,8 @@ export default function CreateForm() {
       payoutRecipient: userAddress as Address,
       platformReferrer: PLATFORM_REFERRER as Address,
       owners,
-      chainId: baseSepolia.id,
-      currency: DeployCurrency.ETH,
+      chainId: base.id,
+      currency: DeployCurrency.ZORA,
     };
     return params;
   };
@@ -321,7 +321,7 @@ export default function CreateForm() {
       const uri = await uploadToIPFS(data);
       const params = prepareCoinParams(data, uri);
       const publicClient = createPublicClient({
-        chain: baseSepolia,
+        chain: base,
         transport: http(),
       });
       const result = await createCoin(params, walletClient, publicClient, {
