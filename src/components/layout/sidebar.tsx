@@ -3,15 +3,23 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@zoralabs/coins-sdk";
-import { Library, PanelLeftOpen } from "lucide-react";
+import { Music2, PanelLeftOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import BubbleIcon from "@/components/icons/bubble.svg";
+import CoinsIcon from "@/components/icons/coins.svg";
+import CompassIcon from "@/components/icons/compass.svg";
+import CompassFillIcon from "@/components/icons/compassFill.svg";
+import HearthIcon from "@/components/icons/hearth.svg";
+import HearthFillIcon from "@/components/icons/hearthFill.svg";
 import HomeIcon from "@/components/icons/home.svg";
 import HomeFillIcon from "@/components/icons/homeFill.svg";
 import PersonIcon from "@/components/icons/person.svg";
 import PersonFillIcon from "@/components/icons/personFill.svg";
+import StarIcon from "@/components/icons/star.svg";
+import StarFillIcon from "@/components/icons/starFill.svg";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
@@ -38,7 +46,7 @@ export function AppSidebar() {
 				: `/profile/${user.wallet.address}`
 			: "/";
 
-	const navLinks = [
+	const mainNavLinks = [
 		{
 			href: "/",
 			label: "Home",
@@ -47,20 +55,59 @@ export function AppSidebar() {
 			isActive: () => pathname === "/",
 		},
 		{
-			href: "/library",
-			label: "Library",
-			icon: Library,
-			iconFill: Library,
-			isActive: () => pathname.startsWith("/library"),
+			href: "/artists",
+			label: "Artists",
+			icon: CompassIcon,
+			iconFill: CompassFillIcon,
+			isActive: () => pathname.startsWith("/artists"),
 		},
 		{
-			href: profileHref,
-			label: "Profile",
-			icon: PersonIcon,
-			iconFill: PersonFillIcon,
-			isActive: () => pathname.startsWith("/profile"),
+			href: "/drops",
+			label: "Drops",
+			icon: CoinsIcon,
+			iconFill: CoinsIcon, // Use same icon for fill since no fill version
+			isActive: () => pathname.startsWith("/drops"),
+		},
+		{
+			href: "/messages",
+			label: "Messages",
+			icon: BubbleIcon,
+			iconFill: BubbleIcon, // Use same icon for fill since no fill version
+			isActive: () => pathname.startsWith("/messages"),
 		},
 	];
+
+	const myLibraryLinks = [
+		{
+			href: "/profile/tracks",
+			label: "Tracks",
+			icon: Music2,
+			iconFill: Music2,
+			isActive: () => pathname === "/profile/tracks",
+		},
+		{
+			href: "/profile/favorites",
+			label: "Favorites",
+			icon: HearthIcon,
+			iconFill: HearthFillIcon,
+			isActive: () => pathname === "/profile/favorites",
+		},
+		{
+			href: "/profile/collections",
+			label: "Collections",
+			icon: StarIcon,
+			iconFill: StarFillIcon,
+			isActive: () => pathname === "/profile/collections",
+		},
+	];
+
+	const profileLink = {
+		href: profileHref,
+		label: "Profile",
+		icon: PersonIcon,
+		iconFill: PersonFillIcon,
+		isActive: () => pathname.startsWith("/profile"),
+	};
 
 	if (collapsed) {
 		return (
@@ -88,15 +135,13 @@ export function AppSidebar() {
 					>
 						<PanelLeftOpen className="h-5 w-5" />
 					</button>
-					{navLinks.map((link) => {
+					{mainNavLinks.map((link) => {
 						const isActive = link.isActive();
-						const IconComponent = link.iconFill
-							? isActive
-								? link.iconFill
-								: link.icon
-							: link.icon;
+						const IconComponent = isActive ? link.iconFill : link.icon;
 						const isProtected =
-							link.label === "Profile" || link.label === "Library";
+							link.label === "Profile" ||
+							link.label === "Library" ||
+							link.label === "Messages";
 						return (
 							<Link
 								key={link.href}
@@ -135,46 +180,67 @@ export function AppSidebar() {
 	return (
 		<div
 			className={cn(
-				// Minimal floating card style for sidebar
 				"flex h-full flex-col transition-all duration-200",
-				"w-64 pl-2",
-				"bg-card rounded-2xl shadow-lg", // Remove border
-				"mt-1 ml-1 mb-1", // Only 4px (mt-1) at top and bottom
+				collapsed ? "w-16 pl-2" : "w-64 pl-2",
+				"bg-card rounded-2xl shadow-lg mt-1 ml-1 mb-1",
 			)}
 		>
 			{/* Top: Logo */}
 			<div className="flex h-16 items-center px-2 gap-2">
 				<Logo variant="sidebar" />
-				<button
-					type="button"
-					aria-label="Collapse sidebar"
-					onClick={() => setCollapsed(true)}
-					className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
-				>
-					<PanelLeftOpen className="h-5 w-5 transform rotate-180" />
-				</button>
+				{!collapsed && (
+					<button
+						type="button"
+						aria-label="Collapse sidebar"
+						onClick={() => setCollapsed(true)}
+						className="ml-auto rounded-md p-2 hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
+					>
+						<PanelLeftOpen className="h-5 w-5 transform rotate-180" />
+					</button>
+				)}
 			</div>
-			{/* Center: Main Nav */}
-			<nav className="flex flex-col gap-2 mt-6">
-				{navLinks.map((link) => {
+			<nav className="flex-1 flex flex-col gap-2 mt-6">
+				{/* Main Navigation */}
+				{mainNavLinks.map((link) => {
 					const isActive = link.isActive();
-					const IconComponent = link.iconFill
-						? isActive
-							? link.iconFill
-							: link.icon
-						: link.icon;
-					const isProtected =
-						link.label === "Profile" || link.label === "Library";
+					const IconComponent = isActive ? link.iconFill : link.icon;
 					return (
 						<Link
 							key={link.href}
 							href={link.href}
 							className={cn(
-								"flex items-center gap-3 rounded-lg px-2 py-3 font-medium transition-colors",
+								"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
+								isActive
+									? "text-foreground bg-muted"
+									: "text-muted-foreground hover:bg-muted hover:text-foreground",
+							)}
+						>
+							<IconComponent className="h-5 w-5" />
+							{!collapsed && <span>{link.label}</span>}
+						</Link>
+					);
+				})}
+				{/* My Library Section Header */}
+				{!collapsed && (
+					<div className="px-4 pt-6 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider select-none cursor-default">
+						My Library
+					</div>
+				)}
+				{/* My Library Links */}
+				{myLibraryLinks.map((link) => {
+					const isActive = link.isActive();
+					const IconComponent = isActive ? link.iconFill : link.icon;
+					const isProtected = true; // All My Library items require authentication
+					return (
+						<Link
+							key={link.href}
+							href={link.href}
+							className={cn(
+								"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
 								isProtected && !authenticated
 									? "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
 									: isActive
-										? "text-foreground font-semibold"
+										? "text-foreground bg-muted"
 										: "text-muted-foreground hover:bg-muted hover:text-foreground",
 							)}
 							onClick={
@@ -187,11 +253,26 @@ export function AppSidebar() {
 							}
 						>
 							<IconComponent className="h-5 w-5" />
-							<span>{link.label}</span>
+							{!collapsed && <span>{link.label}</span>}
 						</Link>
 					);
 				})}
 			</nav>
+			{/* Profile at the bottom */}
+			<div className="mt-auto mb-4 px-4">
+				<Link
+					href={profileLink.href}
+					className={cn(
+						"flex items-center gap-3 rounded-lg px-4 py-2 font-medium transition-colors",
+						profileLink.isActive()
+							? "text-foreground bg-muted"
+							: "text-muted-foreground hover:bg-muted hover:text-foreground",
+					)}
+				>
+					<profileLink.icon className="h-5 w-5" />
+					{!collapsed && <span>{profileLink.label}</span>}
+				</Link>
+			</div>
 		</div>
 	);
 }
