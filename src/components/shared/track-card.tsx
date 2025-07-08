@@ -133,7 +133,7 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
       onKeyDown={handleCardKeyDown}
     >
       {/* Header: Cover + Play */}
-      <div className="relative w-full aspect-[4/5] max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="relative w-full aspect-[3/4] max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
         {coin.mediaContent?.previewImage?.medium ? (
           <Image
             src={coin.mediaContent.previewImage.medium}

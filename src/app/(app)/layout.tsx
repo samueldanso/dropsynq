@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/layout/sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <AppSidebar />
       <div className="flex-1 flex flex-col">
         <AppHeader />

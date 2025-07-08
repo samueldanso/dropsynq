@@ -35,7 +35,7 @@ export function HorizontalScroller({
   return (
     <div className="relative w-full flex items-center justify-start">
       {/* Cards Row (relative for overlay) */}
-      <div className="flex gap-1 w-full justify-start items-stretch relative">
+      <div className="flex gap-0.5 w-full justify-start items-stretch relative">
         {visibleCards.map((card, idx) => {
           // Overlay left arrow on first visible card
           if (idx === 0 && startIndex > 0) {
