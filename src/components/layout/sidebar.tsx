@@ -68,7 +68,7 @@ export function AppSidebar() {
 			href: "/drops",
 			label: "Drops",
 			icon: CoinsIcon,
-			iconFill: CoinsIcon, // Use same icon for fill since no fill version
+			iconFill: CoinsIcon,
 			isActive: () => pathname.startsWith("/drops"),
 		},
 	];

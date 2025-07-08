@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ZoraCoin } from "@/types/zora";
-import BuyCoinButton from "./buy-coin-button";
 import { LikeButton } from "./like-button";
 
 interface TrackCardProps {

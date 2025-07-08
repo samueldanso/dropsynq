@@ -5,7 +5,7 @@ import { useState } from "react";
 import { createPublicClient, http, parseEther } from "viem";
 import { base } from "viem/chains";
 import { useWalletClient } from "wagmi";
-import BuyCoinButton from "@/components/shared/buy-coin-button";
+import BuyCoinButton from "@/components/shared/buy-button";
 import { Button } from "@/components/ui/button";
 
 const PLATFORM_REFERRER = "0xA44Fa8Ad3e905C8AB525cd0cb14319017F1e04e5";
