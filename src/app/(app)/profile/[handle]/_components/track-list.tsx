@@ -1,15 +1,16 @@
 "use client";
 
 import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
+import type { BaseCoin } from "@/types/coin";
 
 interface TrackListProps {
-	coins?: any[];
-	onPlay?: (coin: any) => void;
+	coins: BaseCoin[];
+	onPlay?: (coin: BaseCoin, isPlaying: boolean) => void;
 	playerTrack?: any;
 	isPlayerOpen?: boolean;
 }
 
-export function TrackList({
+export default function TrackList({
 	coins,
 	onPlay,
 	playerTrack,
@@ -44,7 +45,14 @@ export function TrackList({
 				<TrackCard
 					key={coin.address}
 					coin={coin}
-					onPlay={onPlay}
+					onPlay={() =>
+						onPlay?.(
+							coin,
+							playerTrack &&
+								playerTrack.audioUrl === coin.mediaContent?.originalUri &&
+								isPlayerOpen,
+						)
+					}
 					isPlaying={
 						playerTrack &&
 						playerTrack.audioUrl === coin.mediaContent?.originalUri &&

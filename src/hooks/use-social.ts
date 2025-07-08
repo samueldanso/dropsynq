@@ -29,21 +29,6 @@ export function useSongSocial({
 		enabled: !!coinAddress && !!userAddress,
 	});
 
-	// Get song comments
-	const { data: comments, isLoading: isCommentsLoading } = useQuery({
-		queryKey: ["song-comments", coinAddress],
-		queryFn: async () => {
-			const response = await fetch(`/api/songs/${coinAddress}/comment`);
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.error || "Failed to fetch comments");
-			}
-			const data = await response.json();
-			return data.data || [];
-		},
-		enabled: !!coinAddress,
-	});
-
 	// Like song mutation
 	const likeMutation = useMutation({
 		mutationFn: async () => {
@@ -96,33 +81,6 @@ export function useSongSocial({
 		},
 	});
 
-	// Add comment mutation
-	const addCommentMutation = useMutation({
-		mutationFn: async (commentText: string) => {
-			const response = await fetch(`/api/songs/${coinAddress}/comment`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ comment_text: commentText }),
-			});
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.error || "Failed to add comment");
-			}
-			return response.json();
-		},
-		onSuccess: () => {
-			toast.success("Comment added!");
-			queryClient.invalidateQueries({
-				queryKey: ["song-comments", coinAddress],
-			});
-		},
-		onError: (error) => {
-			toast.error(error.message || "Failed to add comment");
-		},
-	});
-
 	const toggleLike = () => {
 		if (isLiked) {
 			unlikeMutation.mutate();
@@ -140,12 +98,6 @@ export function useSongSocial({
 		unlike: unlikeMutation.mutate,
 		isLikeMutationLoading: likeMutation.isPending,
 		isUnlikeMutationLoading: unlikeMutation.isPending,
-
-		// Comments data
-		comments: comments || [],
-		isCommentsLoading,
-		addComment: addCommentMutation.mutate,
-		isAddingComment: addCommentMutation.isPending,
 	};
 }
 

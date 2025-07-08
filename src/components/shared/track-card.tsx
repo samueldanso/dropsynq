@@ -88,7 +88,7 @@ type BaseCoin = {
 
 interface TrackCardProps {
 	coin: BaseCoin;
-	onPlay?: (coin: BaseCoin) => void;
+	onPlay?: (coin: BaseCoin, isPlaying: boolean) => void;
 	isPlaying?: boolean;
 }
 
@@ -155,7 +155,7 @@ export function TrackCard({ coin, onPlay, isPlaying = false }: TrackCardProps) {
 							className="h-16 w-16 rounded-full bg-[#FF9900] text-black opacity-0 transition-all hover:scale-110 hover:bg-[#e88a00] group-hover:opacity-100 focus:opacity-100 z-30 flex items-center justify-center"
 							onClick={(e) => {
 								e.stopPropagation();
-								onPlay?.(coin);
+								onPlay?.(coin, isPlaying);
 							}}
 							aria-label={isPlaying ? "Pause preview" : "Play preview"}
 						>

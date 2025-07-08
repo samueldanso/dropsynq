@@ -26,6 +26,8 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 
 	const [playerTrack, setPlayerTrack] = useState<any | null>(null);
 	const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+	const [shouldPlay, setShouldPlay] = useState(false);
+	const [pauseExternal, setPauseExternal] = useState(false);
 
 	function handlePlay(coin: any) {
 		setPlayerTrack({
@@ -35,7 +37,22 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 			coverUrl: coin.mediaContent?.previewImage?.medium || undefined,
 		});
 		setIsPlayerOpen(true);
+		setShouldPlay(true);
+		setPauseExternal(false);
 	}
+
+	function handlePause() {
+		setPauseExternal(true);
+	}
+
+	function handleDidPlay() {
+		setShouldPlay(false);
+	}
+
+	const isTrackPlaying = (coin: any) =>
+		playerTrack &&
+		playerTrack.audioUrl === coin.mediaContent?.originalUri &&
+		isPlayerOpen;
 
 	const tabs = [
 		{ id: "drops", label: "Drops" },
@@ -69,7 +86,10 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 				{activeTab === "drops" && (
 					<TrackList
 						coins={coins}
-						onPlay={handlePlay}
+						onPlay={(coin: any, isPlaying: boolean) => {
+							if (isTrackPlaying(coin) && isPlaying) handlePause();
+							else handlePlay(coin);
+						}}
 						playerTrack={playerTrack}
 						isPlayerOpen={isPlayerOpen}
 					/>
@@ -84,7 +104,10 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 						balances={balances}
 						playerTrack={playerTrack}
 						isPlayerOpen={isPlayerOpen}
-						onPlay={handlePlay}
+						onPlay={(coin: any, isPlaying: boolean) => {
+							if (isTrackPlaying(coin) && isPlaying) handlePause();
+							else handlePlay(coin);
+						}}
 					/>
 				)}
 				{activeTab === "upcoming" && <UpcomingDrops />}
@@ -92,6 +115,9 @@ export function ProfileTabs({ balances, coins }: ProfileTabsProps) {
 			<MusicPlayer
 				track={playerTrack}
 				isOpen={isPlayerOpen && !!playerTrack}
+				shouldPlay={shouldPlay}
+				onDidPlay={handleDidPlay}
+				pauseExternal={pauseExternal}
 				onClose={() => setIsPlayerOpen(false)}
 			/>
 		</>

@@ -7,8 +7,6 @@ import BuyCoinButton from "@/components/shared/buy-coin-button";
 import { LikeButton } from "@/components/shared/like-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLikeCount } from "@/hooks/use-social";
-import AddCommentForm from "./add-comment-form";
-import CommentSection from "./comment-section";
 import { TradeCard } from "./trade-card";
 
 interface TrackDetailsProps {
@@ -112,18 +110,6 @@ export default function TrackDetails({ id }: TrackDetailsProps) {
 						likeCount={likeCount}
 						className="px-6"
 					/>
-				</div>
-
-				{/* Comments Section */}
-				<div className="mt-12 space-y-6">
-					<AddCommentForm
-						coinAddress={id}
-						onCommentAdded={() => {
-							// Refetch comments when a new comment is added
-							// This will be handled by TanStack Query invalidation
-						}}
-					/>
-					<CommentSection coinAddress={id} />
 				</div>
 			</div>
 		</div>

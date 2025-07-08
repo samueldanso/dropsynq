@@ -29,22 +29,69 @@ function filterAudioCoins(coins: any[]) {
 	);
 }
 
+// Map DB song to TrackCard coin shape
+function mapDbSongToCoin(song: any) {
+	return {
+		address: song.coin_address,
+		name: song.name,
+		description: song.description,
+		mediaContent: {
+			originalUri: song.audio_url,
+			mimeType: "audio/mpeg", // Assume mp3 for now
+			previewImage: { medium: song.image_url },
+		},
+		creatorProfile: { handle: song.creator_address },
+		createdAt: song.created_at,
+		// Add more fields as needed
+	};
+}
+
 export default function AppHomePage() {
 	const [activeGenre, setActiveGenre] = useState("All");
 	const [playerTrack, setPlayerTrack] = useState<any | null>(null);
 	const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
+	// Fetch from DB endpoints
+	const { data: dbRecent = [], isLoading: loadingDbRecent } = useQuery({
+		queryKey: ["songs", "recent"],
+		queryFn: async () => {
+			const res = await fetch("/api/songs/recent");
+			if (!res.ok) return [];
+			return await res.json();
+		},
+	});
+	const { data: dbTrending = [], isLoading: loadingDbTrending } = useQuery({
+		queryKey: ["songs", "trending"],
+		queryFn: async () => {
+			const res = await fetch("/api/songs/trending");
+			if (!res.ok) return [];
+			return await res.json();
+		},
+	});
+	const { data: dbTop = [], isLoading: loadingDbTop } = useQuery({
+		queryKey: ["songs", "top"],
+		queryFn: async () => {
+			const res = await fetch("/api/songs/top");
+			if (!res.ok) return [];
+			return await res.json();
+		},
+	});
+
+	// Fallback to Zora SDK if DB is empty
 	const { data: newestCoins = [], isLoading: loadingNew } = useQuery({
 		queryKey: ["discover-coins", "newest"],
 		queryFn: async () => mapEdges(await getCoinsNew()),
+		enabled: dbRecent.length === 0,
 	});
 	const { data: topGainers = [], isLoading: loadingGainers } = useQuery({
 		queryKey: ["discover-coins", "top-gainers"],
 		queryFn: async () => mapEdges(await getCoinsTopGainers()),
+		enabled: dbTrending.length === 0,
 	});
 	const { data: trendingCoins = [], isLoading: loadingTrending } = useQuery({
 		queryKey: ["discover-coins", "trending"],
 		queryFn: async () => mapEdges(await getCoinsMostValuable()),
+		enabled: dbTop.length === 0,
 	});
 
 	function handleExploreClick() {}
@@ -58,6 +105,14 @@ export default function AppHomePage() {
 		});
 		setIsPlayerOpen(true);
 	}
+
+	// Prefer DB data, fallback to Zora SDK
+	const recentCoins =
+		dbRecent.length > 0 ? dbRecent.map(mapDbSongToCoin) : newestCoins;
+	const trending =
+		dbTrending.length > 0 ? dbTrending.map(mapDbSongToCoin) : topGainers;
+	const topCharts =
+		dbTop.length > 0 ? dbTop.map(mapDbSongToCoin) : trendingCoins;
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -76,11 +131,11 @@ export default function AppHomePage() {
 								Latest Releases
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingNew
+								{loadingDbRecent && dbRecent.length === 0 && loadingNew
 									? generateSkeletonKeys(6, "skeleton-new").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
-									: filterAudioCoins(newestCoins).map((coin) => (
+									: filterAudioCoins(recentCoins).map((coin) => (
 											<TrackCard
 												key={coin.address}
 												coin={coin}
@@ -101,11 +156,11 @@ export default function AppHomePage() {
 								Trending Now
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingGainers
+								{loadingDbTrending && dbTrending.length === 0 && loadingGainers
 									? generateSkeletonKeys(6, "skeleton-gainers").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
-									: filterAudioCoins(topGainers).map((coin) => (
+									: filterAudioCoins(trending).map((coin) => (
 											<TrackCard
 												key={coin.address}
 												coin={coin}
@@ -126,11 +181,11 @@ export default function AppHomePage() {
 								Top Charts
 							</h2>
 							<HorizontalScroller cardsToShow={5}>
-								{loadingTrending
+								{loadingDbTop && dbTop.length === 0 && loadingTrending
 									? generateSkeletonKeys(6, "skeleton-trending").map((key) => (
 											<div key={key} className="w-[300px] flex-shrink-0" />
 										))
-									: filterAudioCoins(trendingCoins).map((coin) => (
+									: filterAudioCoins(topCharts).map((coin) => (
 											<TrackCard
 												key={coin.address}
 												coin={coin}
