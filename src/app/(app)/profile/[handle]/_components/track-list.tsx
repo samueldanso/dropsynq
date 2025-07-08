@@ -4,9 +4,17 @@ import { TrackCard, TrackCardSkeleton } from "@/components/shared/track-card";
 
 interface TrackListProps {
 	coins?: any[];
+	onPlay?: (coin: any) => void;
+	playerTrack?: any;
+	isPlayerOpen?: boolean;
 }
 
-export function TrackList({ coins }: TrackListProps) {
+export function TrackList({
+	coins,
+	onPlay,
+	playerTrack,
+	isPlayerOpen,
+}: TrackListProps) {
 	// Filter for audio coins only
 	const audioCoins = coins?.filter((coin) =>
 		coin.mediaContent?.mimeType?.startsWith("audio/"),
@@ -33,7 +41,16 @@ export function TrackList({ coins }: TrackListProps) {
 	return (
 		<div className="grid gap-1 md:grid-cols-3 lg:grid-cols-5">
 			{audioCoins.map((coin) => (
-				<TrackCard key={coin.address} coin={coin} />
+				<TrackCard
+					key={coin.address}
+					coin={coin}
+					onPlay={onPlay}
+					isPlaying={
+						playerTrack &&
+						playerTrack.audioUrl === coin.mediaContent?.originalUri &&
+						isPlayerOpen
+					}
+				/>
 			))}
 		</div>
 	);

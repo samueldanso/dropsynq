@@ -85,6 +85,12 @@ export default function AppHomePage() {
 												key={coin.address}
 												coin={coin}
 												onPlay={handlePlay}
+												isPlaying={
+													playerTrack &&
+													playerTrack.audioUrl ===
+														coin.mediaContent?.originalUri &&
+													isPlayerOpen
+												}
 											/>
 										))}
 							</HorizontalScroller>
@@ -104,6 +110,12 @@ export default function AppHomePage() {
 												key={coin.address}
 												coin={coin}
 												onPlay={handlePlay}
+												isPlaying={
+													playerTrack &&
+													playerTrack.audioUrl ===
+														coin.mediaContent?.originalUri &&
+													isPlayerOpen
+												}
 											/>
 										))}
 							</HorizontalScroller>
@@ -123,6 +135,12 @@ export default function AppHomePage() {
 												key={coin.address}
 												coin={coin}
 												onPlay={handlePlay}
+												isPlaying={
+													playerTrack &&
+													playerTrack.audioUrl ===
+														coin.mediaContent?.originalUri &&
+													isPlayerOpen
+												}
 											/>
 										))}
 							</HorizontalScroller>

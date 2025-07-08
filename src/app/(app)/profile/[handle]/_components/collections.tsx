@@ -1,6 +1,8 @@
 "use client";
 
 import type { GetProfileBalancesResponse } from "@zoralabs/coins-sdk";
+import { useState } from "react";
+import MusicPlayer from "@/components/shared/music-player";
 import { TrackCard } from "@/components/shared/track-card";
 
 type CoinBalanceNode = NonNullable<
@@ -12,6 +14,9 @@ interface CollectionsProps {
 }
 
 export function Collections({ balances }: CollectionsProps) {
+	const [playerTrack, setPlayerTrack] = useState<any | null>(null);
+	const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+
 	const collections = balances?.filter(
 		(balance) =>
 			balance.coin &&
@@ -27,24 +32,51 @@ export function Collections({ balances }: CollectionsProps) {
 		);
 	}
 
+	function handlePlay(coin: any) {
+		setPlayerTrack({
+			title: coin.name,
+			artist: coin.creatorProfile?.handle || "Unknown",
+			audioUrl: coin.mediaContent?.originalUri || "",
+			coverUrl: coin.mediaContent?.previewImage?.medium || undefined,
+		});
+		setIsPlayerOpen(true);
+	}
+
 	return (
-		<div className="grid gap-1 md:grid-cols-3 lg:grid-cols-5">
-			{collections.map((balance) => {
-				if (!balance.coin) return null;
-				// Only add fallback if zoraComments is present or possibly missing
-				const coin =
-					"zoraComments" in balance.coin
-						? balance.coin
-						: {
-								...balance.coin,
-								zoraComments: {
-									pageInfo: { hasNextPage: false },
-									count: 0,
-									edges: [],
-								} as any,
-							};
-				return <TrackCard key={balance.id} coin={coin} />;
-			})}
-		</div>
+		<>
+			<div className="grid gap-1 md:grid-cols-3 lg:grid-cols-5">
+				{collections.map((balance) => {
+					if (!balance.coin) return null;
+					const coin =
+						"zoraComments" in balance.coin
+							? balance.coin
+							: {
+									...balance.coin,
+									zoraComments: {
+										pageInfo: { hasNextPage: false },
+										count: 0,
+										edges: [],
+									} as any,
+								};
+					return (
+						<TrackCard
+							key={balance.id}
+							coin={coin}
+							onPlay={handlePlay}
+							isPlaying={
+								playerTrack &&
+								playerTrack.audioUrl === coin.mediaContent?.originalUri &&
+								isPlayerOpen
+							}
+						/>
+					);
+				})}
+			</div>
+			<MusicPlayer
+				track={playerTrack}
+				isOpen={isPlayerOpen && !!playerTrack}
+				onClose={() => setIsPlayerOpen(false)}
+			/>
+		</>
 	);
 }

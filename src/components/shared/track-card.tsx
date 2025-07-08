@@ -1,10 +1,11 @@
 "use client";
 
 import type { GetCoinResponse } from "@zoralabs/coins-sdk";
-import { DollarSign, Play, Share2, Users } from "lucide-react";
+import { DollarSign, Pause, Play, Share2, Users } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import BuyCoinButton from "./buy-coin-button";
 import { LikeButton } from "./like-button";
@@ -88,9 +89,10 @@ type BaseCoin = {
 interface TrackCardProps {
 	coin: BaseCoin;
 	onPlay?: (coin: BaseCoin) => void;
+	isPlaying?: boolean;
 }
 
-export function TrackCard({ coin, onPlay }: TrackCardProps) {
+export function TrackCard({ coin, onPlay, isPlaying = false }: TrackCardProps) {
 	const router = useRouter();
 	const { ready, authenticated, login } =
 		require("@privy-io/react-auth").usePrivy();
@@ -112,155 +114,159 @@ export function TrackCard({ coin, onPlay }: TrackCardProps) {
 		else if (address) router.push(`/profile/${address}`);
 	};
 
-	function handleCardClick(e: React.MouseEvent) {
-		// Only navigate if the click is not on a child interactive element
-		if (
-			(e.target as HTMLElement).closest(
-				"button[data-play],button[data-action],button[data-buy]",
-			) === null
-		) {
-			router.push(`/track/${coin.address}`);
-		}
+	function handleCardClick() {
+		router.push(`/track/${coin.address}`);
 	}
 
 	return (
-		<div
-			className="track-card-root group relative w-[220px] h-[300px] cursor-pointer rounded-xl bg-transparent transition-all duration-300 overflow-hidden flex flex-col shadow-none border-none"
+		<button
+			type="button"
+			className="track-card-root group relative w-[220px] h-[300px] cursor-pointer rounded-xl bg-transparent transition-all duration-300 overflow-hidden flex flex-col shadow-none border-none text-left"
 			onClick={handleCardClick}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					handleCardClick();
+				}
+			}}
 		>
-			{/* Header: Cover + Play */}
-			<div className="relative w-full aspect-[3/4] max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
-				{coin.mediaContent?.previewImage?.medium ? (
-					<Image
-						src={coin.mediaContent.previewImage.medium}
-						alt={coin.name}
-						fill
-						className="object-cover transition-transform duration-300 group-hover:scale-105"
-						style={{ objectFit: "cover" }}
-					/>
-				) : (
-					<div className="flex h-full w-full items-center justify-center">
-						<Play className="size-14 text-white/30" />
-					</div>
-				)}
-				{/* Play Overlay - always centered, only visible on hover/focus */}
-				<Button
-					type="button"
-					data-play
-					size="icon"
-					variant="ghost"
-					onClick={(e) => {
-						e.stopPropagation();
-						onPlay?.(coin);
-					}}
-					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto flex items-center justify-center bg-black/0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-200 focus:opacity-100 size-16 outline-none"
-					aria-label="Play preview"
-				>
-					<div className="flex items-center justify-center size-14 bg-[#FF9900] rounded-full shadow-lg">
-						<Play
-							className="size-7 text-black fill-current ml-1"
-							fill="currentColor"
-						/>
-					</div>
-				</Button>
-				{/* Symbol Badge */}
-				<div className="absolute top-2 right-2">
-					<span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
-						{coin.symbol}
-					</span>
-				</div>
-			</div>
-			{/* Content */}
-			<div className="flex-1 px-3 py-2 flex flex-col gap-2 justify-between bg-transparent rounded-b-xl">
-				{/* Title */}
-				<h3 className="font-bold text-base text-foreground line-clamp-1 text-left group-hover:text-primary transition-colors">
-					{coin.name}
-				</h3>
-				{/* Artist */}
-				<div className="flex items-center gap-2 text-sm text-muted-foreground">
-					{coin.creatorProfile?.avatar?.previewImage?.medium && (
+			<Card className="w-full h-full bg-transparent shadow-none border-none p-0 flex flex-col">
+				{/* Header: Cover + Play */}
+				<div className="relative w-full aspect-[3/4] max-w-[180px] mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
+					{coin.mediaContent?.previewImage?.medium ? (
 						<Image
-							src={coin.creatorProfile.avatar.previewImage.medium}
-							alt={coin.creatorProfile.handle || "creator avatar"}
-							width={18}
-							height={18}
-							className="rounded-full"
+							src={coin.mediaContent.previewImage.medium}
+							alt={coin.name}
+							fill
+							className="object-cover transition-transform duration-300 group-hover:scale-105"
+							style={{ objectFit: "cover" }}
 						/>
+					) : (
+						<div className="flex h-full w-full items-center justify-center">
+							<Play className="size-14 text-white/30" />
+						</div>
 					)}
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none text-sm"
-						onClick={(e) => {
-							e.stopPropagation();
-							handleArtistClick(e);
-						}}
-						tabIndex={0}
-						aria-label="View artist profile"
-						data-action
-					>
-						{coin.creatorProfile?.handle || "Unknown Artist"}
-					</Button>
-				</div>
-				{/* Stats Row */}
-				<div className="flex items-center gap-4 text-sm mt-1">
-					<div className="flex items-center gap-1">
-						<DollarSign className="size-4 text-green-500" />
-						<span className="font-semibold text-green-500">
-							{formatMarketCap(coin.marketCap)}
+					{/* Play Overlay - always centered, only visible on hover/focus */}
+					<div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/40">
+						<Button
+							type="button"
+							size="icon"
+							variant="ghost"
+							className="h-16 w-16 rounded-full bg-[#FF9900] text-black opacity-0 transition-all hover:scale-110 hover:bg-[#e88a00] group-hover:opacity-100 focus:opacity-100 z-30 flex items-center justify-center"
+							onClick={(e) => {
+								e.stopPropagation();
+								onPlay?.(coin);
+							}}
+							aria-label={isPlaying ? "Pause preview" : "Play preview"}
+						>
+							{isPlaying ? (
+								<Pause
+									className="size-7 text-black fill-current"
+									fill="currentColor"
+								/>
+							) : (
+								<Play
+									className="size-7 text-black fill-current ml-1"
+									fill="currentColor"
+								/>
+							)}
+						</Button>
+					</div>
+					{/* Symbol Badge */}
+					<div className="absolute top-2 right-2">
+						<span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+							{coin.symbol}
 						</span>
 					</div>
-					<div className="flex items-center gap-1">
-						<Users className="size-4" />
-						<span>{coin.uniqueHolders}</span>
+				</div>
+				{/* Content */}
+				<div className="flex-1 px-3 py-2 flex flex-col gap-2 justify-between bg-transparent rounded-b-xl">
+					{/* Title */}
+					<h3 className="font-bold text-base text-foreground line-clamp-1 text-left group-hover:text-primary transition-colors">
+						{coin.name}
+					</h3>
+					{/* Artist */}
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						{coin.creatorProfile?.avatar?.previewImage?.medium && (
+							<Image
+								src={coin.creatorProfile.avatar.previewImage.medium}
+								alt={coin.creatorProfile.handle || "creator avatar"}
+								width={18}
+								height={18}
+								className="rounded-full"
+							/>
+						)}
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className="hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none text-sm"
+							onClick={(e) => {
+								e.stopPropagation();
+								handleArtistClick(e);
+							}}
+							tabIndex={0}
+							aria-label="View artist profile"
+						>
+							{coin.creatorProfile?.handle || "Unknown Artist"}
+						</Button>
 					</div>
-					<LikeButton
-						coinAddress={coin.address}
-						showCount={false}
-						className="size-7 rounded-full"
-						data-action
-					/>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						onClick={(e) => {
-							e.stopPropagation();
-							if (navigator.share) {
-								navigator.share({
-									title: coin.name,
-									url: window.location.origin + "/track/" + coin.address,
-								});
-							} else {
-								navigator.clipboard.writeText(
-									window.location.origin + "/track/" + coin.address,
-								);
-							}
-						}}
-						className="size-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-						aria-label="Share"
-						data-action
-					>
-						<Share2 className="size-4" />
-					</Button>
+					{/* Stats Row */}
+					<div className="flex items-center gap-4 text-sm mt-1">
+						<div className="flex items-center gap-1">
+							<DollarSign className="size-4 text-green-500" />
+							<span className="font-semibold text-green-500">
+								{formatMarketCap(coin.marketCap)}
+							</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<Users className="size-4" />
+							<span>{coin.uniqueHolders}</span>
+						</div>
+						<LikeButton
+							coinAddress={coin.address}
+							showCount={false}
+							className="size-7 rounded-full"
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							onClick={(e) => {
+								e.stopPropagation();
+								if (navigator.share) {
+									navigator.share({
+										title: coin.name,
+										url: window.location.origin + "/track/" + coin.address,
+									});
+								} else {
+									navigator.clipboard.writeText(
+										window.location.origin + "/track/" + coin.address,
+									);
+								}
+							}}
+							className="size-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+							aria-label="Share"
+						>
+							<Share2 className="size-4" />
+						</Button>
+					</div>
+					{/* Buy Button */}
+					<div className="mt-2">
+						<Button
+							type="button"
+							className="w-full py-2 rounded-xl bg-[#FF9900] text-black font-semibold text-sm hover:bg-[#e88a00] transition z-30 pointer-events-auto"
+							onClick={(e) => {
+								e.stopPropagation();
+								router.push(`/track/${coin.address}`);
+							}}
+						>
+							Buy
+						</Button>
+					</div>
 				</div>
-				{/* Buy Button */}
-				<div className="mt-2">
-					<Button
-						type="button"
-						className="w-full py-2 rounded-xl bg-[#FF9900] text-black font-semibold text-sm hover:bg-[#e88a00] transition z-30 pointer-events-auto"
-						onClick={(e) => {
-							e.stopPropagation();
-							router.push(`/track/${coin.address}`);
-						}}
-						data-buy
-					>
-						Buy
-					</Button>
-				</div>
-			</div>
-		</div>
+			</Card>
+		</button>
 	);
 }
 
