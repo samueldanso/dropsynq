@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import MusicPlayer from "@/components/shared/music-player";
 import type { ZoraCoin, ZoraProfile } from "@/types/zora";
-import { Collections } from "./collections";
-import { TrackList } from "./track-list";
+import Collections from "./collections";
+import TrackList from "./track-list";
 import { UpcomingDrops } from "./upcoming-drops";
 
 type CoinBalanceNode = NonNullable<
