@@ -1,8 +1,6 @@
 # DropSynq
 
-<p align="center">
 A SocialFi music platform where artists launch tokenized songs as tradable coins and earn directly from fans. It lets fans discover, trade, support rising talent, and share in the upside — creating a new way to connect and grow through music. Built on Zora.
-</p>
 
 ## Problem
 
